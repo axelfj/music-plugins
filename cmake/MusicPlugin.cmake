@@ -4,20 +4,27 @@
 #     VERSION <x.y.z[-prerelease]>   (full distribution version, as in plugins/<Name>/VERSION)
 #     [MIDI_INPUT]                   (the plugin wants MIDI note input, e.g. as a trigger)
 #     [IS_SYNTH]                     (instrument: MIDI input, no audio input, AU MusicDevice)
+#     [MIDI_OUTPUT]                  (the plugin also sends MIDI, e.g. a chord or arpeggio tool;
+#                                     combine with IS_SYNTH so FL Studio / Ableton load it as an
+#                                     instrument whose MIDI output can be routed to another track)
 #     CLAP_FEATURES <clap features...>
 #     VST3_CATEGORIES <categories...>
 #     SOURCES <files...>)
 #
 # One call per plugin: VST3, AU (macOS), CLAP and Standalone with the shared ROMMUSER settings.
 function(music_plugin target)
-    cmake_parse_arguments(ARG "MIDI_INPUT;IS_SYNTH" "NAME;CODE;VERSION" "CLAP_FEATURES;VST3_CATEGORIES;SOURCES" ${ARGN})
+    cmake_parse_arguments(ARG "MIDI_INPUT;IS_SYNTH;MIDI_OUTPUT" "NAME;CODE;VERSION" "CLAP_FEATURES;VST3_CATEGORIES;SOURCES" ${ARGN})
 
     # Hosts and installers want a numeric version; the GUI and file names show the full one.
     string(REGEX REPLACE "-.*$" "" numeric_version "${ARG_VERSION}")
 
     set(midi_input FALSE)
     set(is_synth FALSE)
+    set(midi_output FALSE)
     set(au_type kAudioUnitType_Effect)
+    if(ARG_MIDI_OUTPUT)
+        set(midi_output TRUE)
+    endif()
     if(ARG_MIDI_INPUT)
         set(midi_input TRUE)
     endif()
@@ -43,7 +50,7 @@ function(music_plugin target)
         FORMATS ${formats}
         IS_SYNTH ${is_synth}
         NEEDS_MIDI_INPUT ${midi_input}
-        NEEDS_MIDI_OUTPUT FALSE
+        NEEDS_MIDI_OUTPUT ${midi_output}
         IS_MIDI_EFFECT FALSE
         EDITOR_WANTS_KEYBOARD_FOCUS FALSE
         COPY_PLUGIN_AFTER_BUILD FALSE
