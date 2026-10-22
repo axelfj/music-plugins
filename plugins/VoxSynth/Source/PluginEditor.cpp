@@ -126,7 +126,7 @@ void VoxDisplay::paintPitch (juce::Graphics& g, juce::Rectangle<float> plot, juc
     else
         info << tr ("sin tono: la voz pasa tal cual", "no pitch: the voice passes unchanged");
     if (processor.midiHeld.load())
-        info << "   ·   MIDI";
+        info << juce::String::fromUTF8 ("   ·   MIDI");
     g.drawText (info, header.withTrimmedRight (300.0f), juce::Justification::centredLeft);
 
     auto legend = header.removeFromRight (robot ? 160.0f : 300.0f);
@@ -172,13 +172,13 @@ void VoxDisplay::paintBands (juce::Graphics& g, juce::Rectangle<float> plot, juc
     const float carrier = processor.carrierHz.load();
     info << tr ("bandas", "bands") << " " << bandCount;
     if (processor.midiHeld.load())
-        info << "   ·   " << tr ("portadora: MIDI", "carrier: MIDI");
+        info << juce::String::fromUTF8 ("   ·   ") << tr ("portadora: MIDI", "carrier: MIDI");
     else if (carrier > 0.0f)
-        info << "   ·   " << tr ("portadora", "carrier") << " " << noteName (juce::roundToInt ((float) rommuser::dsp::psola::hzToMidi (carrier))) << " " << juce::String (carrier, 1) << " Hz";
+        info << juce::String::fromUTF8 ("   ·   ") << tr ("portadora", "carrier") << " " << noteName (juce::roundToInt ((float) rommuser::dsp::psola::hzToMidi (carrier))) << " " << juce::String (carrier, 1) << " Hz";
     else
-        info << "   ·   " << tr ("portadora externa (sidechain)", "external carrier (sidechain)");
+        info << juce::String::fromUTF8 ("   ·   ") << tr ("portadora externa (sidechain)", "external carrier (sidechain)");
     if (! processor.voiced.load())
-        info << "   ·   " << tr ("sin voz", "no voice");
+        info << juce::String::fromUTF8 ("   ·   ") << tr ("sin voz", "no voice");
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (11.0f));
     g.drawText (info, header, juce::Justification::centredLeft);
@@ -316,7 +316,7 @@ void VoxSynthEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

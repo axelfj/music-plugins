@@ -28,7 +28,8 @@ add_executable(dsp_tests
     test_tuneready.cpp
     test_voxsynth.cpp
     test_stutterready.cpp
-    test_shimmerready.cpp)
+    test_shimmerready.cpp
+    test_waveready.cpp)
 
 target_link_libraries(dsp_tests PRIVATE rommuser_dsp Catch2::Catch2WithMain)
 

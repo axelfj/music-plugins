@@ -85,12 +85,12 @@ void StutterDisplay::paint (juce::Graphics& g)
     juce::String info;
     info << juce::String (juce::roundToInt (processor.hostBpm.load())) << " BPM";
     if (! processor.playing.load())
-        info << "   ·   " << tr ("DAW parado: los gestos arrancan al instante y el secuenciador espera", "DAW stopped: gestures start at once and the sequencer waits");
+        info << juce::String::fromUTF8 ("   ·   ") << tr ("DAW parado: los gestos arrancan al instante y el secuenciador espera", "DAW stopped: gestures start at once and the sequencer waits");
     if (processor.active.load() && gesture >= 0)
     {
         const float beats = processor.divisionNow.load();
-        info << "   ·   " << gestureName (gesture) << "  1/" << juce::String (juce::roundToInt (4.0f / std::max (0.001f, beats)))
-             << "   ·   " << juce::String (juce::roundToInt (processor.progress.load() * 100.0f)) << " %";
+        info << juce::String::fromUTF8 ("   ·   ") << gestureName (gesture) << "  1/" << juce::String (juce::roundToInt (4.0f / std::max (0.001f, beats)))
+             << juce::String::fromUTF8 ("   ·   ") << juce::String (juce::roundToInt (processor.progress.load() * 100.0f)) << " %";
     }
     g.drawText (info, header, juce::Justification::centredLeft);
     g.drawText (tr ("últimos 2 tiempos", "last 2 beats"), header, juce::Justification::centredRight);
@@ -305,7 +305,7 @@ void StutterReadyEditor::selectGesture (int g)
         if (auto* param = processor.state.getParameter (id (k.suffix)))
             k.knob->slider.setDoubleClickReturnValue (true, param->convertFrom0to1 (param->getDefaultValue()));
     }
-    editLabel.setText (tr ("GESTO ", "GESTURE ") + juce::String (g + 1) + "  ·  " + gestureName (g), juce::dontSendNotification);
+    editLabel.setText (tr ("GESTO ", "GESTURE ") + juce::String (g + 1) + juce::String::fromUTF8 ("  ·  ") + gestureName (g), juce::dontSendNotification);
     editLabel.setColour (juce::Label::textColourId, gestureColour (g));
     for (int i = 0; i < numGestures; ++i)
         gestureButtons[i].setToggleState (i == g, juce::dontSendNotification);
@@ -325,7 +325,7 @@ void StutterReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

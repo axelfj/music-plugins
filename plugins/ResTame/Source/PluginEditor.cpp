@@ -67,8 +67,8 @@ void ReductionDisplay::paint (juce::Graphics& g)
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (11.0f));
     juce::String label = tr ("reducción por frecuencia", "reduction per frequency");
-    if (external) label << "  ·  " << tr ("detector: sidechain externo", "detector: external sidechain");
-    if (delta) label << "  ·  DELTA";
+    if (external) label << juce::String::fromUTF8 ("  ·  ") << tr ("detector: sidechain externo", "detector: external sidechain");
+    if (delta) label << juce::String::fromUTF8 ("  ·  DELTA");
     g.drawText (label, title, juce::Justification::topLeft);
 }
 
@@ -174,7 +174,7 @@ void ResTameEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

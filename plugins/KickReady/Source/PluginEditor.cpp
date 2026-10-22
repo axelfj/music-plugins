@@ -109,9 +109,9 @@ void KickDisplay::paint (juce::Graphics& g)
     float peak = 0.0f;
     for (float v : wave) peak = std::max (peak, std::fabs (v));
     juce::String info;
-    info << noteName (note) << "  ·  " << juce::String (midiToHz (note + params.tuneSemitones), 1) << " Hz"
-         << "  ·  " << juce::String (juce::roundToInt (lengthS * 1000.0)) << " ms"
-         << "  ·  " << tr ("pico", "peak") << " " << juce::String (20.0f * std::log10 (std::max (peak, 1e-5f)), 1) << " dBFS";
+    info << noteName (note) << juce::String::fromUTF8 ("  ·  ") << juce::String (midiToHz (note + params.tuneSemitones), 1) << " Hz"
+         << juce::String::fromUTF8 ("  ·  ") << juce::String (juce::roundToInt (lengthS * 1000.0)) << " ms"
+         << juce::String::fromUTF8 ("  ·  ") << tr ("pico", "peak") << " " << juce::String (20.0f * std::log10 (std::max (peak, 1e-5f)), 1) << " dBFS";
     g.drawText (info, juce::Rectangle<float> (plot.getX(), r.getY() + 6.0f, plot.getWidth() - 120.0f, 14.0f), juce::Justification::centredLeft);
     g.setColour (colours::good);
     g.drawText (tr ("— envolvente de tono", "— pitch envelope"), juce::Rectangle<float> (plot.getRight() - 120.0f, r.getY() + 6.0f, 120.0f, 14.0f), juce::Justification::centredRight);
@@ -261,7 +261,7 @@ void KickReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

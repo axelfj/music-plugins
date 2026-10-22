@@ -95,13 +95,13 @@ void ResponseDisplay::paint (juce::Graphics& g)
 
     juce::String label = juce::String (stages) + " " + tr ("etapas", "stages");
     if (params.sync)
-        label << "  ·  " << Choices::divisions[juce::jlimit (0, Choices::divisions.size() - 1,
+        label << juce::String::fromUTF8 ("  ·  ") << Choices::divisions[juce::jlimit (0, Choices::divisions.size() - 1,
             (int) std::distance (std::begin (Choices::divisionBeats),
                                  std::find_if (std::begin (Choices::divisionBeats), std::end (Choices::divisionBeats),
                                                [&] (double b) { return std::fabs (b - params.beats) < 1e-9; })))]
-              << "  ·  " << juce::String (params.bpm, 0) << " bpm";
+              << juce::String::fromUTF8 ("  ·  ") << juce::String (params.bpm, 0) << " bpm";
     else
-        label << "  ·  " << juce::String (params.rateHz, params.rateHz < 1.0f ? 2 : 1) << " Hz";
+        label << juce::String::fromUTF8 ("  ·  ") << juce::String (params.rateHz, params.rateHz < 1.0f ? 2 : 1) << " Hz";
     g.drawText (label, plot.removeFromTop (14.0f), juce::Justification::topLeft);
 }
 
@@ -209,7 +209,7 @@ void PhaseReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

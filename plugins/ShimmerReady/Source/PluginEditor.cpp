@@ -86,10 +86,10 @@ void EchoDisplay::paint (juce::Graphics& g)
 
     juce::String info;
     info << tr ("retardo", "delay") << " " << juce::String (delayMs, 1) << " ms";
-    if (params.sync) info << " (" << divisionNames[params.division] << " · " << juce::String (juce::roundToInt (processor.hostBpm.load())) << " BPM)";
+    if (params.sync) info << " (" << divisionNames[params.division] << juce::String::fromUTF8 (" · ") << juce::String (juce::roundToInt (processor.hostBpm.load())) << " BPM)";
     const float hz = processor.inputHz.load();
-    if (hz > 0.0f) info << "   ·   " << tr ("tono en el bucle", "loop pitch") << " " << noteName (hz) << " " << juce::String (hz, 1) << " Hz";
-    if (params.freeze) info << "   ·   FREEZE";
+    if (hz > 0.0f) info << juce::String::fromUTF8 ("   ·   ") << tr ("tono en el bucle", "loop pitch") << " " << noteName (hz) << " " << juce::String (hz, 1) << " Hz";
+    if (params.freeze) info << juce::String::fromUTF8 ("   ·   FREEZE");
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (11.0f));
     g.drawText (info, header, juce::Justification::centredLeft);
@@ -203,7 +203,7 @@ void ShimmerReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

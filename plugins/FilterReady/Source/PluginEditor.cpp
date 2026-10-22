@@ -162,8 +162,8 @@ void ResponseDisplay::paint (juce::Graphics& g)
     juce::String label;
     label << "A " << (cutoffA >= 1000.0f ? juce::String (cutoffA / 1000.0f, 2) + " kHz" : juce::String ((int) cutoffA) + " Hz");
     if (params.b.enabled)
-        label << "   ·   B " << (cutoffB >= 1000.0f ? juce::String (cutoffB / 1000.0f, 2) + " kHz" : juce::String ((int) cutoffB) + " Hz");
-    label << "   ·   " << tr ("arrastra A / B para mover corte y resonancia", "drag A / B to move cutoff and resonance");
+        label << juce::String::fromUTF8 ("   ·   B ") << (cutoffB >= 1000.0f ? juce::String (cutoffB / 1000.0f, 2) + " kHz" : juce::String ((int) cutoffB) + " Hz");
+    label << juce::String::fromUTF8 ("   ·   ") << tr ("arrastra A / B para mover corte y resonancia", "drag A / B to move cutoff and resonance");
     g.drawText (label, top, juce::Justification::centredLeft);
 
     auto lfoArea = juce::Rectangle<float> (top.getRight() - 80.0f, top.getY() + 1.0f, 80.0f, 12.0f);
@@ -372,7 +372,7 @@ void FilterReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);
