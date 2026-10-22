@@ -17,6 +17,12 @@ on:
 permissions:
   contents: write
 
+# A new push to a PR cancels the run still going for the previous head; releases (workflow_dispatch)
+# and main pushes are never cancelled.
+concurrency:
+  group: build-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   BUILD_TYPE: Release
 
@@ -33,7 +39,7 @@ jobs:
       - name: Configure
         run: cmake -S . -B build-tests -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DMUSIC_PLUGINS_BUILD_PLUGINS=OFF
       - name: Build
-        run: cmake --build build-tests --config ${{ env.BUILD_TYPE }} --parallel
+        run: cmake --build build-tests --config ${{ env.BUILD_TYPE }} --parallel 4
       - name: Run
         run: ctest --test-dir build-tests -C ${{ env.BUILD_TYPE }} --output-on-failure
 
@@ -70,15 +76,27 @@ jobs:
           path: build/_deps
           key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'tests/CMakeLists.txt') }}
 
+      # Every plugin compiles its own copy of the JUCE modules; ccache makes the second run of an
+      # unchanged plugin nearly free (Linux / macOS; MSVC is left alone).
+      - name: ccache
+        if: runner.os != 'Windows'
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-${{ runner.os }}
+          max-size: 1G
+
       - name: Configure
         shell: bash
         run: |
           extra=""
           if [ "$RUNNER_OS" = "macOS" ]; then extra='-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64'; fi
+          if [ "$RUNNER_OS" != "Windows" ]; then extra="$extra -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"; fi
           cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DMUSIC_PLUGINS_BUILD_TESTS=OFF $extra
 
+      # An explicit job count: "--parallel" alone means unlimited with Makefiles, and with several
+      # plugins the Linux runner ran out of memory compiling JUCE many times at once.
       - name: Build
-        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel 4
 
       - name: Validate with pluginval
         shell: bash
@@ -88,10 +106,22 @@ jobs:
           if [ "$RUNNER_OS" = "macOS" ]; then PV=pluginval/pluginval.app/Contents/MacOS/pluginval
           elif [ "$RUNNER_OS" = "Windows" ]; then PV=pluginval/pluginval.exe
           else PV=pluginval/pluginval; chmod +x $PV; fi
+          # pluginval occasionally segfaults while tearing down *after* it has printed its
+          # verdict (seen on Linux). Judge the run by the verdict in its output, not the exit code.
+          validate() {
+            echo "== $1"
+            set +e
+            "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$1" 2>&1 | tee pluginval.log
+            set -e
+            if grep -q "^SUCCESS" pluginval.log && ! grep -qE "^FAILURE|^\*\*\* FAILED|!!! Test" pluginval.log; then
+              echo "pluginval: SUCCESS for $1"
+            else
+              echo "::error::pluginval did not report SUCCESS for $1"; exit 1
+            fi
+          }
           shopt -s nullglob
           for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/VST3/*.vst3; do
-            echo "== $p"
-            "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$p"
+            validate "$p"
           done
           # macOS only finds Audio Units that are installed in a Components folder.
           if [ "$RUNNER_OS" = "macOS" ]; then
@@ -99,8 +129,7 @@ jobs:
             for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/AU/*.component; do
               cp -R "$p" ~/Library/Audio/Plug-Ins/Components/
               killall -9 AudioComponentRegistrar 2>/dev/null || true
-              echo "== $p"
-              "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate ~/Library/Audio/Plug-Ins/Components/"$(basename "$p")"
+              validate ~/Library/Audio/Plug-Ins/Components/"$(basename "$p")"
             done
           fi
 

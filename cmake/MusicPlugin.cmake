@@ -2,16 +2,22 @@
 #     NAME "<Product Name>"
 #     CODE <4-char plugin code, unique per plugin, first letter uppercase>
 #     VERSION <x.y.z[-prerelease]>   (full distribution version, as in plugins/<Name>/VERSION)
+#     [MIDI_INPUT]                   (the plugin wants MIDI note input, e.g. as a trigger)
 #     CLAP_FEATURES <clap features...>
 #     VST3_CATEGORIES <categories...>
 #     SOURCES <files...>)
 #
 # One call per plugin: VST3, AU (macOS), CLAP and Standalone with the shared ROMMUSER settings.
 function(music_plugin target)
-    cmake_parse_arguments(ARG "" "NAME;CODE;VERSION" "CLAP_FEATURES;VST3_CATEGORIES;SOURCES" ${ARGN})
+    cmake_parse_arguments(ARG "MIDI_INPUT" "NAME;CODE;VERSION" "CLAP_FEATURES;VST3_CATEGORIES;SOURCES" ${ARGN})
 
     # Hosts and installers want a numeric version; the GUI and file names show the full one.
     string(REGEX REPLACE "-.*$" "" numeric_version "${ARG_VERSION}")
+
+    set(midi_input FALSE)
+    if(ARG_MIDI_INPUT)
+        set(midi_input TRUE)
+    endif()
 
     set(formats VST3 Standalone)
     if(APPLE)
@@ -28,7 +34,7 @@ function(music_plugin target)
         PLUGIN_CODE ${ARG_CODE}
         FORMATS ${formats}
         IS_SYNTH FALSE
-        NEEDS_MIDI_INPUT FALSE
+        NEEDS_MIDI_INPUT ${midi_input}
         NEEDS_MIDI_OUTPUT FALSE
         IS_MIDI_EFFECT FALSE
         EDITOR_WANTS_KEYBOARD_FOCUS FALSE
