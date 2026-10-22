@@ -114,7 +114,9 @@ jobs:
             $name = $dir.Name
             $version = (Get-Content "plugins/$name/VERSION" -First 1).Trim()
             $art = Get-ChildItem "build/plugins/$name" -Directory -Filter "*_artefacts" | Select-Object -First 1
-            $product = (Get-ChildItem "$($art.FullName)/${{ env.BUILD_TYPE }}/VST3" -Filter "*.vst3" | Select-Object -First 1).BaseName
+            # The .vst3 is a folder, so BaseName would keep the extension.
+            $product = (Get-ChildItem "$($art.FullName)/${{ env.BUILD_TYPE }}/VST3" -Filter "*.vst3" | Select-Object -First 1).Name -replace '\.vst3$', ''
+            "Packaging $product $version"
             & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DPluginName=$product" "/DPluginSlug=$name" "/DPluginVersion=$version" "/DArtefacts=$($art.FullName)\${{ env.BUILD_TYPE }}" installer\windows\plugin.iss
             if ($LASTEXITCODE -ne 0) { exit 1 }
           }
