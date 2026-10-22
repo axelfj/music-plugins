@@ -16,6 +16,7 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | **Duck Ready** | Sidechain / volume shaper sincronizado al tempo, disparo por tempo, MIDI o bombo, modo multibanda | Alpha |
 | **Band Push** | Compresor multibanda de 3 bandas hacia arriba y hacia abajo (estilo OTT) con una perilla de profundidad | Alpha |
 | **Warm Drive** | Saturación de 1 a 4 bandas con cinco curvas (tape, tube, transistor, soft clip, rectify), auto gain y sobremuestreo | Alpha |
+| **Gate Ready** | Gate y expansor con histéresis, hold, lookahead, filtros de sidechain con Escuchar y sidechain externo | Alpha |
 | Res Tame | Supresor de resonancias dinámico | Planeado |
 
 El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).

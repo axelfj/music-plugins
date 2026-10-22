@@ -11,7 +11,8 @@ add_executable(dsp_tests
     test_pressready.cpp
     test_duckready.cpp
     test_bandpush.cpp
-    test_warmdrive.cpp)
+    test_warmdrive.cpp
+    test_gateready.cpp)
 
 target_link_libraries(dsp_tests PRIVATE rommuser_dsp Catch2::Catch2WithMain)
 
