@@ -107,18 +107,25 @@ jobs:
           if [ "$RUNNER_OS" = "macOS" ]; then PV=pluginval/pluginval.app/Contents/MacOS/pluginval
           elif [ "$RUNNER_OS" = "Windows" ]; then PV=pluginval/pluginval.exe
           else PV=pluginval/pluginval; chmod +x $PV; fi
-          # pluginval occasionally segfaults while tearing down *after* it has printed its
-          # verdict (seen on Linux). Judge the run by the verdict in its output, not the exit code.
+          # pluginval occasionally segfaults while tearing down the in-process plugin (seen on
+          # Linux): sometimes after it has printed its verdict, sometimes just before, with every
+          # test group already completed. Judge the run by the verdict in its output, not the exit
+          # code; a crash with no verdict and no failed test is retried (up to 3 attempts), a
+          # reported failure is final.
           validate() {
             echo "== $1"
-            set +e
-            "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$1" 2>&1 | tee pluginval.log
-            set -e
-            if grep -q "^SUCCESS" pluginval.log && ! grep -qE "^FAILURE|^\*\*\* FAILED|!!! Test" pluginval.log; then
-              echo "pluginval: SUCCESS for $1"
-            else
-              echo "::error::pluginval did not report SUCCESS for $1"; exit 1
-            fi
+            for attempt in 1 2 3; do
+              set +e
+              "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$1" 2>&1 | tee pluginval.log
+              set -e
+              if grep -qE "^FAILURE|^\*\*\* FAILED|!!! Test" pluginval.log; then
+                echo "::error::pluginval reported a failure for $1"; exit 1
+              elif grep -q "^SUCCESS" pluginval.log; then
+                echo "pluginval: SUCCESS for $1"; return 0
+              fi
+              echo "::warning::pluginval exited without a verdict for $1 (attempt $attempt), retrying"
+            done
+            echo "::error::pluginval did not report SUCCESS for $1"; exit 1
           }
           shopt -s nullglob
           for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/VST3/*.vst3; do
