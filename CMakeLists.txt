@@ -50,6 +50,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/EssClean)
     add_subdirectory(plugins/PeakReady)
     add_subdirectory(plugins/MasterCheckLive)
+    add_subdirectory(plugins/FilterReady)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)
