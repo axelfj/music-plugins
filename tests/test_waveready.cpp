@@ -65,7 +65,9 @@ double magAt (const std::vector<float>& x, int from, int n, double hz, bool blac
         const double t = 2.0 * 3.14159265358979 * i / n;
         const double w = blackmanHarris ? 0.35875 - 0.48829 * std::cos (t) + 0.14128 * std::cos (2.0 * t) - 0.01168 * std::cos (3.0 * t)
                                         : 0.5 - 0.5 * std::cos (t);
-        acc += std::polar (w * (double) x[(size_t) (from + i)], -2.0 * 3.14159265358979 * hz * i / sr);
+        // Magnitude times a unit phasor: std::polar with a negative magnitude is undefined and libc++
+        // (macOS) returns NaN for it.
+        acc += (w * (double) x[(size_t) (from + i)]) * std::polar (1.0, -2.0 * 3.14159265358979 * hz * i / sr);
     }
     return std::abs (acc) * 2.0 / n;
 }

@@ -76,7 +76,8 @@ private:
                     if (std::fabs (amp) < 1e-9f)
                         continue;
                     // A sine of harmonic n: X[n] = -i A/2 (times N because inverse scales by 1/N).
-                    const std::complex<float> c = std::polar (0.5f * amp * (float) tableSize, phase - 1.5707963f);
+                    // (magnitude times a unit phasor: std::polar needs a non-negative magnitude)
+                    const std::complex<float> c = (0.5f * amp * (float) tableSize) * std::polar (1.0f, phase - 1.5707963f);
                     spec[(size_t) n] = c;
                     spec[(size_t) (tableSize - n)] = std::conj (c);
                 }
