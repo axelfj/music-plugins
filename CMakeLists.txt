@@ -42,6 +42,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/GateReady)
     add_subdirectory(plugins/EchoReady)
     add_subdirectory(plugins/PhaseReady)
+    add_subdirectory(plugins/WideReady)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)
