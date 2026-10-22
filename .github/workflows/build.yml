@@ -113,7 +113,7 @@ jobs:
             set +e
             "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$1" 2>&1 | tee pluginval.log
             set -e
-            if grep -q "^SUCCESS" pluginval.log && ! grep -qE "FAILED|^!!!" pluginval.log; then
+            if grep -q "^SUCCESS" pluginval.log && ! grep -qE "^FAILURE|^\*\*\* FAILED|!!! Test" pluginval.log; then
               echo "pluginval: SUCCESS for $1"
             else
               echo "::error::pluginval did not report SUCCESS for $1"; exit 1

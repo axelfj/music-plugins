@@ -123,9 +123,10 @@ bool PressReadyProcessor::isBusesLayoutSupported (const BusesLayout& layouts) co
         return false;
     if (layouts.getMainInputChannelSet() != out)
         return false;
-    // The sidechain may be absent, or match the main bus.
     const auto sc = layouts.getChannelSet (true, 1);
-    return sc.isDisabled() || sc == out;
+    // The sidechain may be absent, mono or stereo regardless of the main bus (auval tries
+    // every combination; a mono sidechain is mapped onto both channels in processBlock).
+    return sc.isDisabled() || sc == juce::AudioChannelSet::mono() || sc == juce::AudioChannelSet::stereo();
 }
 
 void PressReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
@@ -142,10 +143,10 @@ void PressReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
     if (getBusCount (true) > 1 && getBus (true, 1)->isEnabled())
     {
         auto scBuffer = getBusBuffer (buffer, true, 1);
-        if (scBuffer.getNumChannels() >= numIn && numIn <= rommuser::pressready::CompEngine::maxChannels)
+        if (scBuffer.getNumChannels() > 0 && numIn <= rommuser::pressready::CompEngine::maxChannels)
         {
             for (int c = 0; c < numIn; ++c)
-                scPtrs[c] = scBuffer.getReadPointer (c);
+                scPtrs[c] = scBuffer.getReadPointer (std::min (c, scBuffer.getNumChannels() - 1));
             sc = scPtrs;
         }
     }

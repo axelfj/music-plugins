@@ -135,7 +135,9 @@ bool DuckReadyProcessor::isBusesLayoutSupported (const BusesLayout& layouts) con
     if (layouts.getMainInputChannelSet() != out)
         return false;
     const auto sc = layouts.getChannelSet (true, 1);
-    return sc.isDisabled() || sc == out;
+    // The sidechain may be absent, mono or stereo regardless of the main bus (auval tries
+    // every combination; a mono sidechain is mapped onto both channels in processBlock).
+    return sc.isDisabled() || sc == juce::AudioChannelSet::mono() || sc == juce::AudioChannelSet::stereo();
 }
 
 void DuckReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midi)
@@ -151,10 +153,10 @@ void DuckReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
     if (getBusCount (true) > 1 && getBus (true, 1)->isEnabled())
     {
         auto scBuffer = getBusBuffer (buffer, true, 1);
-        if (scBuffer.getNumChannels() >= numIn && numIn <= DuckEngine::maxChannels)
+        if (scBuffer.getNumChannels() > 0 && numIn <= DuckEngine::maxChannels)
         {
             for (int c = 0; c < numIn; ++c)
-                scPtrs[c] = scBuffer.getReadPointer (c);
+                scPtrs[c] = scBuffer.getReadPointer (std::min (c, scBuffer.getNumChannels() - 1));
             sc = scPtrs;
         }
     }
