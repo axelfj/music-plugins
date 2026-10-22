@@ -14,6 +14,7 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | **Shape EQ** | EQ paramétrico de 12 bandas con analizador, M/S y bell "matched" | Alpha |
 | **Press Ready** | Compresor con tres caracteres (Clean / Punch / Glue), sidechain y lookahead | Alpha |
 | **Duck Ready** | Sidechain / volume shaper sincronizado al tempo, disparo por tempo, MIDI o bombo, modo multibanda | Alpha |
+| **Band Push** | Compresor multibanda de 3 bandas hacia arriba y hacia abajo (estilo OTT) con una perilla de profundidad | Alpha |
 | Res Tame | Supresor de resonancias dinámico | Planeado |
 
 El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).

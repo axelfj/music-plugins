@@ -37,6 +37,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/ShapeEQ)
     add_subdirectory(plugins/PressReady)
     add_subdirectory(plugins/DuckReady)
+    add_subdirectory(plugins/BandPush)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)

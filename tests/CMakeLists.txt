@@ -9,7 +9,8 @@ add_executable(dsp_tests
     test_clipready.cpp
     test_shapeeq.cpp
     test_pressready.cpp
-    test_duckready.cpp)
+    test_duckready.cpp
+    test_bandpush.cpp)
 
 target_link_libraries(dsp_tests PRIVATE rommuser_dsp Catch2::Catch2WithMain)
 
