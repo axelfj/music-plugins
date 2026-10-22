@@ -52,6 +52,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/MasterCheckLive)
     add_subdirectory(plugins/FilterReady)
     add_subdirectory(plugins/KickReady)
+    add_subdirectory(plugins/TuneReady)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)
