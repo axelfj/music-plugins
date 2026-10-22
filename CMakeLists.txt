@@ -43,6 +43,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/EchoReady)
     add_subdirectory(plugins/PhaseReady)
     add_subdirectory(plugins/WideReady)
+    add_subdirectory(plugins/SpaceReady)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)

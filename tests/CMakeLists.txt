@@ -15,7 +15,8 @@ add_executable(dsp_tests
     test_gateready.cpp
     test_echoready.cpp
     test_phaseready.cpp
-    test_wideready.cpp)
+    test_wideready.cpp
+    test_spaceready.cpp)
 
 target_link_libraries(dsp_tests PRIVATE rommuser_dsp Catch2::Catch2WithMain)
 
