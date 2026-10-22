@@ -1,7 +1,7 @@
 # music_plugin(<target>
 #     NAME "<Product Name>"
 #     CODE <4-char plugin code, unique per plugin, first letter uppercase>
-#     VERSION <x.y.z>
+#     VERSION <x.y.z[-prerelease]>   (full distribution version, as in plugins/<Name>/VERSION)
 #     CLAP_FEATURES <clap features...>
 #     VST3_CATEGORIES <categories...>
 #     SOURCES <files...>)
@@ -9,6 +9,9 @@
 # One call per plugin: VST3, AU (macOS), CLAP and Standalone with the shared ROMMUSER settings.
 function(music_plugin target)
     cmake_parse_arguments(ARG "" "NAME;CODE;VERSION" "CLAP_FEATURES;VST3_CATEGORIES;SOURCES" ${ARGN})
+
+    # Hosts and installers want a numeric version; the GUI and file names show the full one.
+    string(REGEX REPLACE "-.*$" "" numeric_version "${ARG_VERSION}")
 
     set(formats VST3 Standalone)
     if(APPLE)
@@ -20,7 +23,7 @@ function(music_plugin target)
         COMPANY_WEBSITE "https://rommuser.com"
         BUNDLE_ID "com.rommuser.${target}"
         PRODUCT_NAME "${ARG_NAME}"
-        VERSION "${ARG_VERSION}"
+        VERSION "${numeric_version}"
         PLUGIN_MANUFACTURER_CODE Rmmr
         PLUGIN_CODE ${ARG_CODE}
         FORMATS ${formats}

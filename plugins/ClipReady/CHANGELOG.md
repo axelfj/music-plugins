@@ -1,5 +1,10 @@
 # Clip Ready
 
+## 1.0.0-alpha.2
+
+- Techo estricto ahora limita la salida final: antes solo limitaba la señal recortada, así que con Mix < 100 % o Salida > 0 dB el pico podía pasar del techo (#34). DELTA sigue sin límite, es un modo de monitoreo.
+- Los instaladores y el release llevan la versión completa (`ClipReady-Setup-1.0.0-alpha.2.exe`, etc.); antes decían `1.0.0` (#35).
+
 ## 1.0.0-alpha.1
 
 Primera versión pública para probar. / First public test build.

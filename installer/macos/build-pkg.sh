@@ -9,6 +9,7 @@ mkdir -p "$out"
 for dir in plugins/*/; do
     slug=$(basename "$dir")
     version=$(head -n1 "$dir/VERSION" | tr -d '[:space:]')
+    numeric=${version%%-*}   # pkgbuild only accepts digits and dots
     art=$(ls -d "$build/plugins/$slug/"*_artefacts | head -n1)/"$config"
     product=$(basename "$art"/VST3/*.vst3 .vst3)
 
@@ -25,7 +26,7 @@ for dir in plugins/*/; do
 
     pkgbuild --root "$root" \
              --identifier "com.rommuser.$slug" \
-             --version "$version" \
+             --version "$numeric" \
              --install-location / \
              "$out/$slug-$version.pkg"
     rm -rf "$root"

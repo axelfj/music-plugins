@@ -54,11 +54,11 @@ cmake/           music_plugin() helper
 
 ## Calidad
 
-Cada plugin lleva pruebas automáticas de DSP que corren en CI en Windows, macOS y Linux, y pasa [pluginval](https://github.com/Tracktion/pluginval) en nivel estricto. Las pruebas de Clip Ready verifican, por ejemplo, que el pico de salida nunca supere el techo, que con Mix al 0 % la salida sea idéntica a la entrada, y que a 8x el aliasing quede por debajo de -100 dBFS.
+Cada plugin lleva pruebas automáticas de DSP que corren en CI en Windows, macOS y Linux, y pasa [pluginval](https://github.com/Tracktion/pluginval) en nivel estricto. Las pruebas de Clip Ready verifican, por ejemplo, que el pico de salida nunca supere el techo, que con Techo estricto la salida final nunca supere el techo con cualquier Mix o Salida, que con Mix al 0 % (sin techo estricto) la salida sea idéntica a la entrada, y que a 8x el aliasing quede por debajo de -100 dBFS.
 
 ## Publicar una versión
 
-Cada plugin se versiona por separado (`plugins/<Name>/VERSION` + `CHANGELOG.md`). Para publicar, corre el workflow **Build** manualmente (*Run workflow*) con el plugin y la versión, por ejemplo `ClipReady` y `1.0.0-alpha.1`. CI compila en los tres sistemas, valida, crea el tag `clip-ready-v1.0.0-alpha.1` y sube los instaladores al release.
+Cada plugin se versiona por separado: `plugins/<Name>/VERSION` guarda la versión completa (por ejemplo `1.0.0-alpha.2`; la parte numérica es la que ven el DAW y los instaladores) y `CHANGELOG.md` tiene una sección por versión. Para publicar, sube `VERSION` y el changelog, mergea, y corre el workflow **Build** manualmente (*Run workflow*) con el plugin y exactamente esa versión, por ejemplo `ClipReady` y `1.0.0-alpha.2`. CI compila en los tres sistemas, valida, crea el tag `clip-ready-v1.0.0-alpha.1` y sube los instaladores al release.
 
 ## Contribuir
 

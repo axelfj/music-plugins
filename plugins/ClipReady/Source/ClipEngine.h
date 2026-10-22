@@ -6,7 +6,8 @@
 //   x -> * (inGain / ceiling) -> upsample -> curve -> downsample -> [strict: clip at 1] -> * ceiling = wet
 //   x -> delay(latency) = dry
 //   out = outGain * (mix * wet * linkComp + (1 - mix) * dry)          (normal)
-//   out = outGain * (dry * inGain - wet) * linkComp                   (delta: only what gets clipped)
+//         -> with strictCeiling the final sample is clamped to +-ceiling as well
+//   out = outGain * (dry * inGain - wet) * linkComp                   (delta: only what gets clipped, unlimited)
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
@@ -33,7 +34,7 @@ struct ClipParams
     int oversampling = 4;     // 1, 2, 4, 8
     bool delta = false;
     bool gainLink = false;    // output follows -input so loudness stays comparable
-    bool strictCeiling = true; // hard-limit the downsampled signal so the sample peak never passes the ceiling
+    bool strictCeiling = true; // hard-limit wet after downsampling AND the final output (incl. Mix/Output), so the sample peak never passes the ceiling
 };
 
 struct ClipMeters
@@ -218,9 +219,17 @@ private:
 
                 float y;
                 if (params.delta)
-                    y = o * (d * g - w) * lc;
+                {
+                    y = o * (d * g - w) * lc;   // monitoring mode: not limited on purpose
+                }
                 else
+                {
                     y = o * (m * w * lc + (1.0f - m) * d);
+                    // The ceiling is a promise about what leaves the plugin, so it also covers the dry
+                    // share of Mix and the Output gain. Dry material below the ceiling is untouched.
+                    if (params.strictCeiling)
+                        y = std::clamp (y, -ce, ce);
+                }
 
                 x[i] = y;
                 meters.outputPeak = std::max (meters.outputPeak, std::fabs (y));

@@ -71,6 +71,7 @@ TEST_CASE ("Mix at 0% returns the input exactly, delayed by the reported latency
     p.oversampling = factor;
     p.mix = 0.0f;
     p.inputDb = 12.0f;
+    p.strictCeiling = false; // with strict on, dry peaks above the ceiling would be clamped (by design)
     const auto in = whiteNoise (20000, 0.9);
     const auto out = run (p, in);
     const int lat = latencyFor (factor);
@@ -96,6 +97,26 @@ TEST_CASE ("Output sample peak never exceeds the ceiling", "[clipready]")
         const auto out = run (p, sig);
         REQUIRE (peak (out) <= ceiling * (1.0f + 1e-6f));
     }
+}
+
+TEST_CASE ("Strict ceiling bounds the final output for every Mix and Output setting", "[clipready]")
+{
+    // Issue #34: Mix < 100 % lets dry through and Output can push wet over the ceiling.
+    const float mix = GENERATE (0.0f, 0.5f, 1.0f);
+    const float outputDb = GENERATE (0.0f, 12.0f);
+    const bool link = GENERATE (false, true);
+    ClipParams p;
+    p.oversampling = 1;
+    p.inputDb = 12.0f;
+    p.ceilingDb = -6.0f;
+    p.softness = 0.0f;
+    p.mix = mix;
+    p.outputDb = outputDb;
+    p.gainLink = link;
+    const float ceiling = std::pow (10.0f, -6.0f / 20.0f);
+    const auto out = run (p, std::vector<float> (20000, 0.9f));
+    INFO ("mix " << mix << " output " << outputDb << " link " << link);
+    REQUIRE (peak (out) <= ceiling * (1.0f + 1e-6f));
 }
 
 TEST_CASE ("Signals below the knee pass untouched apart from the latency", "[clipready]")
