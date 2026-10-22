@@ -1,0 +1,10 @@
+build/
+build-*/
+dist/
+_deps/
+.cache/
+.vs/
+.vscode/
+.idea/
+*.user
+.DS_Store

@@ -1,0 +1,188 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: "Plugin to release (folder name under plugins/)"
+        required: true
+        default: ClipReady
+      version:
+        description: "Release version, e.g. 1.0.0-alpha.1 (must start with the plugin's VERSION file)"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  tests:
+    name: DSP tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build-tests -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DMUSIC_PLUGINS_BUILD_PLUGINS=OFF
+      - name: Build
+        run: cmake --build build-tests --config ${{ env.BUILD_TYPE }} --parallel
+      - name: Run
+        run: ctest --test-dir build-tests -C ${{ env.BUILD_TYPE }} --output-on-failure
+
+  plugins:
+    name: Plugins (${{ matrix.name }})
+    needs: tests
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            os: windows-latest
+            pluginval: https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_Windows.zip
+          - name: macOS
+            os: macos-latest
+            pluginval: https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_macOS.zip
+          - name: Linux
+            os: ubuntu-latest
+            pluginval: https://github.com/Tracktion/pluginval/releases/download/v1.0.4/pluginval_Linux.zip
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libasound2-dev libx11-dev libxrandr-dev libxinerama-dev \
+            libxcursor-dev libxcomposite-dev libfreetype-dev libfontconfig1-dev libgl1-mesa-dev libcurl4-openssl-dev
+
+      - name: Cache dependencies (JUCE, CLAP, Catch2)
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'tests/CMakeLists.txt') }}
+
+      - name: Configure
+        shell: bash
+        run: |
+          extra=""
+          if [ "$RUNNER_OS" = "macOS" ]; then extra='-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64'; fi
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DMUSIC_PLUGINS_BUILD_TESTS=OFF $extra
+
+      - name: Build
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
+
+      - name: Validate with pluginval
+        shell: bash
+        run: |
+          curl -sSL -o pluginval.zip "${{ matrix.pluginval }}"
+          unzip -q pluginval.zip -d pluginval
+          if [ "$RUNNER_OS" = "macOS" ]; then PV=pluginval/pluginval.app/Contents/MacOS/pluginval
+          elif [ "$RUNNER_OS" = "Windows" ]; then PV=pluginval/pluginval.exe
+          else PV=pluginval/pluginval; chmod +x $PV; fi
+          shopt -s nullglob
+          for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/VST3/*.vst3; do
+            echo "== $p"
+            "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$p"
+          done
+          # macOS only finds Audio Units that are installed in a Components folder.
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            mkdir -p ~/Library/Audio/Plug-Ins/Components
+            for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/AU/*.component; do
+              cp -R "$p" ~/Library/Audio/Plug-Ins/Components/
+              killall -9 AudioComponentRegistrar 2>/dev/null || true
+              echo "== $p"
+              "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate ~/Library/Audio/Plug-Ins/Components/"$(basename "$p")"
+            done
+          fi
+
+      - name: Package (Windows installer)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          New-Item -ItemType Directory -Force dist | Out-Null
+          foreach ($dir in Get-ChildItem plugins -Directory) {
+            $name = $dir.Name
+            $version = (Get-Content "plugins/$name/VERSION" -First 1).Trim()
+            $art = Get-ChildItem "build/plugins/$name" -Directory -Filter "*_artefacts" | Select-Object -First 1
+            # The .vst3 is a folder, so BaseName would keep the extension.
+            $product = (Get-ChildItem "$($art.FullName)/${{ env.BUILD_TYPE }}/VST3" -Filter "*.vst3" | Select-Object -First 1).Name -replace '\.vst3$', ''
+            "Packaging $product $version"
+            & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DPluginName=$product" "/DPluginSlug=$name" "/DPluginVersion=$version" "/DArtefacts=$($art.FullName)\${{ env.BUILD_TYPE }}" installer\windows\plugin.iss
+            if ($LASTEXITCODE -ne 0) { exit 1 }
+          }
+          Get-ChildItem dist
+
+      - name: Package (macOS pkg)
+        if: runner.os == 'macOS'
+        run: installer/macos/build-pkg.sh build ${{ env.BUILD_TYPE }} dist
+
+      - name: Package (Linux tarball)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p dist
+          for dir in plugins/*/; do
+            name=$(basename "$dir"); version=$(head -n1 "$dir/VERSION")
+            art=$(ls -d build/plugins/$name/*_artefacts | head -n1)/${{ env.BUILD_TYPE }}
+            tar -C "$art" -czf "dist/$name-$version-linux-x86_64.tar.gz" VST3 CLAP
+          done
+          ls -l dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: dist/*
+
+  release:
+    name: Release ${{ inputs.plugin }} ${{ inputs.version }}
+    if: github.event_name == 'workflow_dispatch'
+    needs: plugins
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Check version and collect files
+        id: prep
+        run: |
+          plugin="${{ inputs.plugin }}"; version="${{ inputs.version }}"
+          base=$(head -n1 "plugins/$plugin/VERSION")
+          case "$version" in "$base"*) ;; *) echo "::error::$version does not start with plugins/$plugin/VERSION ($base)"; exit 1;; esac
+          slug=$(echo "$plugin" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
+          echo "tag=$slug-v$version" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$([[ "$version" == *-* ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          mkdir -p release
+          find artifacts -type f -name "$plugin*" -exec cp {} release/ \;
+          ls -l release
+          python3 - "$plugin" "$version" <<'EOF'
+          import re, sys
+          plugin, version = sys.argv[1:]
+          text = open(f"plugins/{plugin}/CHANGELOG.md", encoding="utf-8").read()
+          m = re.search(r"^## \[?%s\]?.*?$(.*?)(?=^## |\Z)" % re.escape(version), text, re.M | re.S)
+          notes = (m.group(1).strip() if m else "") + (
+              "\n\n### Descarga / Download\n\n"
+              f"- Windows: `{plugin}-Setup-{version}.exe` (VST3 + CLAP)\n"
+              f"- macOS: `{plugin}-{version}.pkg` (VST3 + AU + CLAP, Intel y Apple silicon)\n"
+              f"- Linux: `{plugin}-*-linux-x86_64.tar.gz`\n\n"
+              "Los instaladores todavia no estan firmados. En macOS, el README explica como abrirlos la primera vez. / "
+              "The installers are not code-signed yet; see the README for the first-launch steps on macOS.\n")
+          open("notes.md", "w", encoding="utf-8").write(notes)
+          EOF
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.prep.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ inputs.plugin }} ${{ inputs.version }}
+          prerelease: ${{ steps.prep.outputs.prerelease == 'true' }}
+          body_path: notes.md
+          files: release/*
