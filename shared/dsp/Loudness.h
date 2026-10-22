@@ -7,10 +7,13 @@
 #pragma once
 
 #include "Biquad.h"
+#include "Oversampler.h"
 
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <memory>
+#include <utility>
 #include <vector>
 
 namespace rommuser::dsp
@@ -67,7 +70,11 @@ public:
         blocksSeen = 0;
         head = 0;
         gatedPowers.clear();
+        shortTermPowers.clear();
         momentary = shortTerm = integrated = silence;
+        maxMomentary = maxShortTerm = silence;
+        loudnessRange = 0.0f;
+        newBlock = false;
     }
 
     void process (const float* const* in, int numChannels, int n)
@@ -88,6 +95,11 @@ public:
     float getMomentary() const { return momentary; }
     float getShortTerm() const { return shortTerm; }
     float getIntegrated() const { return integrated; }
+    float getMaxMomentary() const { return maxMomentary; }
+    float getMaxShortTerm() const { return maxShortTerm; }
+    // EBU Tech 3342 loudness range: gated (-70 abs, -20 LU rel) short-term values, 10th to 95th percentile.
+    float getLoudnessRange() const { return loudnessRange; }
+    bool hasNewBlock() { return std::exchange (newBlock, false); }
 
     static float toLufs (double power) { return power > 1.0e-12 ? (float) (-0.691 + 10.0 * std::log10 (power)) : silence; }
 
@@ -115,7 +127,40 @@ private:
 
         const double m = meanOfLast (4);
         momentary = toLufs (m);
-        shortTerm = toLufs (meanOfLast (30));
+        const double st = meanOfLast (30);
+        shortTerm = toLufs (st);
+        if (blocksSeen >= 4) maxMomentary = std::max (maxMomentary, momentary);
+        if (blocksSeen >= 30) maxShortTerm = std::max (maxShortTerm, shortTerm);
+        newBlock = true;
+
+        // Loudness range from the gated short-term values (EBU Tech 3342).
+        if (blocksSeen >= 30 && shortTerm > absoluteGateLufs)
+        {
+            shortTermPowers.push_back (st);
+            double sum = 0.0;
+            for (double p : shortTermPowers) sum += p;
+            const float relGate = toLufs (sum / (double) shortTermPowers.size()) - 20.0f;
+            std::vector<float> kept;
+            kept.reserve (shortTermPowers.size());
+            for (double p : shortTermPowers)
+            {
+                const float l = toLufs (p);
+                if (l > relGate) kept.push_back (l);
+            }
+            if (kept.size() >= 2)
+            {
+                std::sort (kept.begin(), kept.end());
+                auto percentile = [&kept] (double q)
+                {
+                    const double pos = q * (double) (kept.size() - 1);
+                    const size_t lo = (size_t) std::floor (pos);
+                    const size_t hi = std::min (lo + 1, kept.size() - 1);
+                    const double frac = pos - (double) lo;
+                    return (float) ((1.0 - frac) * kept[lo] + frac * kept[hi]);
+                };
+                loudnessRange = std::max (0.0f, percentile (0.95) - percentile (0.10));
+            }
+        }
 
         // Integrated: every 100 ms a 400 ms window enters the gate.
         if (blocksSeen >= 4 && momentary > absoluteGateLufs)
@@ -137,8 +182,72 @@ private:
     std::array<Biquad, maxChannels> stage1, stage2;
     std::array<double, maxChannels> sumSquares {};
     std::array<double, 30> blockPowers {};
-    std::vector<double> gatedPowers;
+    std::vector<double> gatedPowers, shortTermPowers;
     float momentary = silence, shortTerm = silence, integrated = silence;
+    float maxMomentary = silence, maxShortTerm = silence, loudnessRange = 0.0f;
+    bool newBlock = false;
+};
+
+// True-peak meter (BS.1770 Annex 2): 4x oversampled absolute maximum, per block and held.
+class TruePeakMeter
+{
+public:
+    static constexpr int maxChannels = 2;
+
+    void prepare (double sampleRate, int maxBlockSize)
+    {
+        factor = sampleRate >= 176400.0 ? 1 : sampleRate >= 88200.0 ? 2 : 4;
+        maxBlock = std::max (1, maxBlockSize);
+        for (auto& o : oversamplers)
+        {
+            o = std::make_unique<Oversampler> (maxBlock);
+            o->prepare (factor, maxBlock);
+        }
+        reset();
+    }
+
+    void reset()
+    {
+        for (auto& o : oversamplers) if (o) o->reset();
+        held = 0.0f;
+        samplePeakHeld = 0.0f;
+    }
+
+    // Returns the true peak of this block (linear); the held maximum is kept in getHeld().
+    float process (const float* const* in, int numChannels, int n)
+    {
+        float blockPeak = 0.0f;
+        const int nch = std::clamp (numChannels, 1, maxChannels);
+        for (int c = 0; c < nch; ++c)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                const float a = std::fabs (in[c][i]);
+                blockPeak = std::max (blockPeak, a);
+                samplePeakHeld = std::max (samplePeakHeld, a);
+            }
+            if (factor > 1 && oversamplers[(size_t) c])
+            {
+                for (int pos = 0; pos < n; pos += maxBlock)
+                {
+                    const int len = std::min (maxBlock, n - pos);
+                    const float* hi = oversamplers[(size_t) c]->upsample (in[c] + pos, len);
+                    for (int j = 0; j < len * factor; ++j)
+                        blockPeak = std::max (blockPeak, std::fabs (hi[j]));
+                }
+            }
+        }
+        held = std::max (held, blockPeak);
+        return blockPeak;
+    }
+
+    float getHeld() const { return held; }
+    float getSamplePeakHeld() const { return samplePeakHeld; }
+
+private:
+    int factor = 4, maxBlock = 512;
+    std::array<std::unique_ptr<Oversampler>, maxChannels> oversamplers;
+    float held = 0.0f, samplePeakHeld = 0.0f;
 };
 
 } // namespace rommuser::dsp

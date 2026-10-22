@@ -26,6 +26,7 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | **Punch Shape** | Transient shaper (ataque / sustain) independiente del nivel, con filtro en el detector y clipper opcional | Alpha |
 | **Ess Clean** | De-esser por banda o broadband con rango sobre el espectro, lookahead y Escuchar | Alpha |
 | **Peak Ready** | Limitador true-peak con lookahead, release adaptativo, tres estilos y medidor LUFS con objetivo | Alpha |
+| **Master Check Live** | Medidor LUFS / LRA / true peak en tiempo real con los perfiles de plataforma de Master Check | Alpha |
 
 El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 

@@ -49,6 +49,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/PunchShape)
     add_subdirectory(plugins/EssClean)
     add_subdirectory(plugins/PeakReady)
+    add_subdirectory(plugins/MasterCheckLive)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)
