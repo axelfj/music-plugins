@@ -40,6 +40,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/BandPush)
     add_subdirectory(plugins/WarmDrive)
     add_subdirectory(plugins/GateReady)
+    add_subdirectory(plugins/EchoReady)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)
