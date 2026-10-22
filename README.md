@@ -23,6 +23,11 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | **Space Ready** | Reverb algorítmica FDN (Room, Plate, Hall, Ambience) con RT60 exacto, modulación, ducking y freeze | Alpha |
 | **Res Tame** | Supresor de resonancias dinámico (STFT) con Delta, Mid/Side y sidechain "unmask" | Alpha |
 | **Low Mono** | Imager estéreo con mono en graves (Linkwitz-Riley 24/48 dB/oct), goniómetro y correlación | Alpha |
+| **Punch Shape** | Transient shaper (ataque / sustain) independiente del nivel, con filtro en el detector y clipper opcional | Alpha |
+| **Ess Clean** | De-esser por banda o broadband con rango sobre el espectro, lookahead y Escuchar | Alpha |
+| **Peak Ready** | Limitador true-peak con lookahead, release adaptativo, tres estilos y medidor LUFS con objetivo | Alpha |
+| **Master Check Live** | Medidor LUFS / LRA / true peak en tiempo real con los perfiles de plataforma de Master Check | Alpha |
+| **Filter Ready** | Doble filtro resonante (LP/HP/BP/notch, 12/24 dB) en serie o paralelo con LFO sincronizado, envolvente, drive y carácter Analog | Alpha |
 
 El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 
