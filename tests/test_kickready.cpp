@@ -142,8 +142,9 @@ TEST_CASE ("Kick Ready: exponential amplitude decay reaches -60 dB at the decay 
     // Level at 150 ms: exp(-6.9078 * 0.5) = -30 dB (±1.5 dB; measured on the cycle peak).
     const float half = peakAbs (x, d / 2 - 400, d / 2 + 400);
     REQUIRE (20.0f * std::log10 (half) == Approx (-30.0f).margin (1.5f));
-    // Silence after the decay time and the voice is no longer sounding.
-    REQUIRE (peakAbs (x, d + 10, 48000) == 0.0f);
+    // Silence after the decay time (below -120 dBFS: the output filters may leave a rounding-level
+    // tail, which differs between FMA and non-FMA builds) and the voice is no longer sounding.
+    REQUIRE (peakAbs (x, d + 10, 48000) < 1e-6f);
     REQUIRE_FALSE (e.isSounding());
 }
 
@@ -159,7 +160,8 @@ TEST_CASE ("Kick Ready: linear decay is a straight ramp to zero", "[kickready]")
     auto x = render (e, 48000);
     const int d = (int) (0.3 * sr);
     REQUIRE (peakAbs (x, d / 2 - 400, d / 2 + 400) == Approx (0.5f).margin (0.03f));
-    REQUIRE (peakAbs (x, d + 10, 48000) == 0.0f);
+    REQUIRE (peakAbs (x, d + 10, 48000) < 1e-6f);
+    REQUIRE_FALSE (e.isSounding());
 }
 
 TEST_CASE ("Kick Ready: the click lives in the first milliseconds and above its tone frequency", "[kickready]")
