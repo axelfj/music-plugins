@@ -11,7 +11,7 @@ on:
         required: true
         default: ClipReady
       version:
-        description: "Release version, e.g. 1.0.0-alpha.1 (must start with the plugin's VERSION file)"
+        description: "Release version, e.g. 1.0.0-alpha.1 (must equal the plugin's VERSION file)"
         required: true
 
 permissions:
@@ -157,7 +157,7 @@ jobs:
         run: |
           plugin="${{ inputs.plugin }}"; version="${{ inputs.version }}"
           base=$(head -n1 "plugins/$plugin/VERSION")
-          case "$version" in "$base"*) ;; *) echo "::error::$version does not start with plugins/$plugin/VERSION ($base)"; exit 1;; esac
+          if [ "$version" != "$base" ]; then echo "::error::$version does not match plugins/$plugin/VERSION ($base); bump VERSION first"; exit 1; fi
           slug=$(echo "$plugin" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
           echo "tag=$slug-v$version" >> "$GITHUB_OUTPUT"
           echo "prerelease=$([[ "$version" == *-* ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
@@ -166,16 +166,20 @@ jobs:
           mkdir -p release
           find artifacts -type f -name "$plugin*" -exec cp {} release/ \;
           ls -l release
-          python3 - "$plugin" "$version" "$base" <<'EOF'
+          # Every file announced in the notes must exist among the assets.
+          for f in "$plugin-Setup-$version.exe" "$plugin-$version.pkg" "$plugin-$version-linux-x86_64.tar.gz"; do
+            [ -f "release/$f" ] || { echo "::error::missing asset $f"; exit 1; }
+          done
+          python3 - "$plugin" "$version" <<'EOF'
           import re, sys
-          plugin, version, base = sys.argv[1:]   # installers are named after the VERSION file, not the tag
+          plugin, version = sys.argv[1:]
           text = open(f"plugins/{plugin}/CHANGELOG.md", encoding="utf-8").read()
           m = re.search(r"^## \[?%s\]?.*?$(.*?)(?=^## |\Z)" % re.escape(version), text, re.M | re.S)
           notes = (m.group(1).strip() if m else "") + (
               "\n\n### Descarga / Download\n\n"
-              f"- Windows: `{plugin}-Setup-{base}.exe` (VST3 + CLAP)\n"
-              f"- macOS: `{plugin}-{base}.pkg` (VST3 + AU + CLAP, Intel y Apple silicon)\n"
-              f"- Linux: `{plugin}-{base}-linux-x86_64.tar.gz`\n\n"
+              f"- Windows: `{plugin}-Setup-{version}.exe` (VST3 + CLAP)\n"
+              f"- macOS: `{plugin}-{version}.pkg` (VST3 + AU + CLAP, Intel y Apple silicon)\n"
+              f"- Linux: `{plugin}-{version}-linux-x86_64.tar.gz`\n\n"
               "Los instaladores todavia no estan firmados. En macOS, el README explica como abrirlos la primera vez. / "
               "The installers are not code-signed yet; see the README for the first-launch steps on macOS.\n")
           open("notes.md", "w", encoding="utf-8").write(notes)

@@ -193,10 +193,10 @@ ClipReadyEditor::ClipReadyEditor (ClipReadyProcessor& p)
           tr ("Escucha solo lo que el clipper está quitando. Si suena a distorsión fuerte, te pasaste.",
               "Hear only what the clipper removes. If it sounds like heavy distortion, back off.") },
         { &strict, ParamIDs::strict, tr ("TECHO ESTRICTO", "STRICT CEILING"),
-          tr ("Encendido: el pico nunca pasa del techo (ideal en el master). Apagado: un poco más limpio, "
-              "pero puede pasar el techo por unas décimas de dB.",
-              "On: the peak never goes above the ceiling (best on the master). Off: slightly cleaner, "
-              "but it can go a few tenths of a dB over the ceiling.") },
+          tr ("Encendido: lo que sale del plugin nunca pasa del techo, aunque subas Salida o uses Mix (ideal en el master). "
+              "Apagado: un poco más limpio, pero puede pasar el techo. DELTA no se limita.",
+              "On: nothing leaving the plugin goes above the ceiling, even with Output or Mix (best on the master). "
+              "Off: slightly cleaner, but it can go over the ceiling. DELTA is never limited.") },
     };
     for (const auto& b : buttons)
     {
