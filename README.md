@@ -21,7 +21,7 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | **Phase Ready** | Phaser de 4 a 12 etapas con LFO libre o sincronizado (seno, triángulo, random), feedback y stereo spread | Alpha |
 | **Wide Ready** | Chorus de 1 a 3 voces (ensemble), flanger through-zero con feedback y micro-pitch estéreo | Alpha |
 | **Space Ready** | Reverb algorítmica FDN (Room, Plate, Hall, Ambience) con RT60 exacto, modulación, ducking y freeze | Alpha |
-| Res Tame | Supresor de resonancias dinámico | Planeado |
+| **Res Tame** | Supresor de resonancias dinámico (STFT) con Delta, Mid/Side y sidechain "unmask" | Alpha |
 
 El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 
