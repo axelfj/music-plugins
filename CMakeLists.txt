@@ -34,6 +34,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
 
     include(cmake/MusicPlugin.cmake)
     add_subdirectory(plugins/ClipReady)
+    add_subdirectory(plugins/ShapeEQ)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)

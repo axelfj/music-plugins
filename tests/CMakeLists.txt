@@ -6,7 +6,8 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(dsp_tests
     test_oversampler.cpp
-    test_clipready.cpp)
+    test_clipready.cpp
+    test_shapeeq.cpp)
 
 target_link_libraries(dsp_tests PRIVATE rommuser_dsp Catch2::Catch2WithMain)
 

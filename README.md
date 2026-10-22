@@ -11,7 +11,7 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | Plugin | Qué hace | Estado |
 | --- | --- | --- |
 | **Clip Ready** | Clipper suave con sobremuestreo para drums, bajos y master | Alpha |
-| Shape EQ | EQ paramétrico con analizador (estilo pro) | Planeado |
+| **Shape EQ** | EQ paramétrico de 12 bandas con analizador, M/S y bell "matched" | Alpha |
 | Duck Ready | Sidechain / volume shaper sincronizado al tempo | Planeado |
 | Res Tame | Supresor de resonancias dinámico | Planeado |
 
