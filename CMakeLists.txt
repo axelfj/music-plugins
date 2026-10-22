@@ -54,6 +54,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/KickReady)
     add_subdirectory(plugins/TuneReady)
     add_subdirectory(plugins/VoxSynth)
+    add_subdirectory(plugins/StutterReady)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)
