@@ -58,6 +58,51 @@ private:
     std::array<Biquad, 2> low, high;
 };
 
+// Two-way LR8 split (48 dB/oct): two cascaded 4th-order Butterworth sections per band, so low + high
+// is still all-pass. Steeper than LR4; used where the bands must really not overlap (Low Mono).
+class LR8Crossover
+{
+public:
+    void prepare (double newSampleRate)
+    {
+        sampleRate = newSampleRate;
+        setFrequency (frequency);
+        reset();
+    }
+
+    void setFrequency (double hz)
+    {
+        frequency = hz;
+        for (int section = 0; section < 2; ++section)
+        {
+            const double q = biquad::butterworthSectionQ (4, section);
+            const auto lp = biquad::lowPass (hz, q, sampleRate);
+            const auto hp = biquad::highPass (hz, q, sampleRate);
+            low[(size_t) section].setCoeffs (lp);      low[(size_t) section + 2].setCoeffs (lp);
+            high[(size_t) section].setCoeffs (hp);     high[(size_t) section + 2].setCoeffs (hp);
+        }
+    }
+
+    double getFrequency() const { return frequency; }
+
+    void reset()
+    {
+        for (auto& f : low) f.reset();
+        for (auto& f : high) f.reset();
+    }
+
+    inline void process (float x, float& lo, float& hi)
+    {
+        lo = x; hi = x;
+        for (auto& f : low) lo = f.process (lo);
+        for (auto& f : high) hi = f.process (hi);
+    }
+
+private:
+    double sampleRate = 48000.0, frequency = 1000.0;
+    std::array<Biquad, 4> low, high;
+};
+
 // Three-way split for one channel. The low band is passed through the high crossover's all-pass so
 // that low + mid + high has a flat magnitude (the classic LR4 phase-compensation trick).
 class ThreeBandSplitter

@@ -45,6 +45,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/WideReady)
     add_subdirectory(plugins/SpaceReady)
     add_subdirectory(plugins/ResTame)
+    add_subdirectory(plugins/LowMono)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)
