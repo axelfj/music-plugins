@@ -47,6 +47,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/ResTame)
     add_subdirectory(plugins/LowMono)
     add_subdirectory(plugins/PunchShape)
+    add_subdirectory(plugins/EssClean)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)

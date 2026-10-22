@@ -24,6 +24,7 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | **Res Tame** | Supresor de resonancias dinámico (STFT) con Delta, Mid/Side y sidechain "unmask" | Alpha |
 | **Low Mono** | Imager estéreo con mono en graves (Linkwitz-Riley 24/48 dB/oct), goniómetro y correlación | Alpha |
 | **Punch Shape** | Transient shaper (ataque / sustain) independiente del nivel, con filtro en el detector y clipper opcional | Alpha |
+| **Ess Clean** | De-esser por banda o broadband con rango sobre el espectro, lookahead y Escuchar | Alpha |
 
 El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 
