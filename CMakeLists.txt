@@ -58,6 +58,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/StutterReady)
     add_subdirectory(plugins/ShimmerReady)
     add_subdirectory(plugins/ChordReady)
+    add_subdirectory(plugins/ArpReady)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)

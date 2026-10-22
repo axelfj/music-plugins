@@ -77,6 +77,16 @@ inline int stepInScale (const Scale& s, int root, int midi, int offset)
     return midi - s.steps[(size_t) degree] + s.steps[(size_t) wrapped] + 12 * octaves;
 }
 
+// A note event inside a block, as the MIDI tools exchange them (sample offset within the block).
+struct NoteEvent
+{
+    int sample = 0;
+    bool on = true;
+    int note = 60;
+    int velocity = 100;
+    int channel = 1;
+};
+
 // Tiny deterministic random source for humanize / random modes (no <random> on the audio thread).
 struct Rng
 {

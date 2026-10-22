@@ -76,14 +76,7 @@ struct ChordParams
     float humanize = 0.0f;     // 0..1 random velocity
 };
 
-struct NoteEvent
-{
-    int sample = 0;
-    bool on = true;
-    int note = 60;
-    int velocity = 100;
-    int channel = 1;
-};
+using NoteEvent = midi::NoteEvent;
 
 class ChordEngine
 {
