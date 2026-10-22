@@ -183,7 +183,7 @@ TEST_CASE ("Loudness meter: a 997 Hz sine at -20 dBFS in both channels reads -20
     for (size_t pos = 0; pos < l.size(); pos += (size_t) block)
     {
         const float* ch[] = { l.data() + pos, r.data() + pos };
-        m.process (ch, 2, block);
+        m.process (ch, 2, std::min (block, (int) (l.size() - pos)));
     }
     REQUIRE (m.getMomentary() == Catch::Approx (-20.0).margin (0.1));
     REQUIRE (m.getShortTerm() == Catch::Approx (-20.0).margin (0.1));
@@ -194,7 +194,7 @@ TEST_CASE ("Loudness meter: a 997 Hz sine at -20 dBFS in both channels reads -20
     for (size_t pos = 0; pos < z.size(); pos += (size_t) block)
     {
         const float* ch[] = { z.data() + pos, z.data() + pos };
-        m.process (ch, 2, block);
+        m.process (ch, 2, std::min (block, (int) (z.size() - pos)));
     }
     // The 400 ms windows straddling the cut are quieter but still above the gates, so the integrated
     // value moves a little (as the standard prescribes); the silence itself is excluded.
