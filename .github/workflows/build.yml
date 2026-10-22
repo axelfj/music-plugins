@@ -89,10 +89,20 @@ jobs:
           elif [ "$RUNNER_OS" = "Windows" ]; then PV=pluginval/pluginval.exe
           else PV=pluginval/pluginval; chmod +x $PV; fi
           shopt -s nullglob
-          for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/VST3/*.vst3 build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/AU/*.component; do
+          for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/VST3/*.vst3; do
             echo "== $p"
             "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$p"
           done
+          # macOS only finds Audio Units that are installed in a Components folder.
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            mkdir -p ~/Library/Audio/Plug-Ins/Components
+            for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/AU/*.component; do
+              cp -R "$p" ~/Library/Audio/Plug-Ins/Components/
+              killall -9 AudioComponentRegistrar 2>/dev/null || true
+              echo "== $p"
+              "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate ~/Library/Audio/Plug-Ins/Components/"$(basename "$p")"
+            done
+          fi
 
       - name: Package (Windows installer)
         if: runner.os == 'Windows'
