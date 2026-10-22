@@ -20,7 +20,8 @@ add_executable(dsp_tests
     test_restame.cpp
     test_lowmono.cpp
     test_punchshape.cpp
-    test_essclean.cpp)
+    test_essclean.cpp
+    test_peakready.cpp)
 
 target_link_libraries(dsp_tests PRIVATE rommuser_dsp Catch2::Catch2WithMain)
 
