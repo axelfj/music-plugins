@@ -70,7 +70,7 @@ void TapDisplay::paint (juce::Graphics& g)
             (int) std::distance (std::begin (Choices::divisionBeats),
                                  std::find_if (std::begin (Choices::divisionBeats), std::end (Choices::divisionBeats),
                                                [&] (double b) { return std::fabs (b - params.beats) < 1e-9; })))]
-              + "  ·  " + label + "  ·  " + juce::String (params.bpm, 0) + " bpm";
+              + juce::String::fromUTF8 ("  ·  ") + label + juce::String::fromUTF8 ("  ·  ") + juce::String (params.bpm, 0) + " bpm";
     g.drawText (label, r.removeFromTop (14.0f), juce::Justification::topRight);
     if (pingPong)
     {
@@ -198,7 +198,7 @@ void EchoReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

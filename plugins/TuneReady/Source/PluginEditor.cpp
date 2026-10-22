@@ -95,13 +95,13 @@ void PitchDisplay::paint (juce::Graphics& g)
         const int nearest = juce::roundToInt (midi);
         info << tr ("entrada", "input") << " " << noteName (nearest) << " " << juce::String (hz, 1) << " Hz ("
              << (midi - (float) nearest >= 0.0f ? "+" : "") << juce::String (juce::roundToInt ((midi - (float) nearest) * 100.0f)) << " c)"
-             << "   ·   " << tr ("corrección", "shift") << " " << (processor.shiftSemis.load() >= 0.0f ? "+" : "")
+             << juce::String::fromUTF8 ("   ·   ") << tr ("corrección", "shift") << " " << (processor.shiftSemis.load() >= 0.0f ? "+" : "")
              << juce::String (processor.shiftSemis.load() * 100.0f, 0) << " c";
     }
     else
         info << tr ("sin tono (silencio o consonante): la señal pasa sin cambios", "no pitch (silence or consonant): signal passes unchanged");
     if (processor.midiHeld.load())
-        info << "   ·   MIDI";
+        info << juce::String::fromUTF8 ("   ·   MIDI");
     g.drawText (info, juce::Rectangle<float> (plot.getX(), r.getY() + 6.0f, plot.getWidth(), 14.0f), juce::Justification::centredLeft);
     g.setColour (colours::accent);
     g.drawText (tr ("— corregido", "— corrected"), juce::Rectangle<float> (plot.getRight() - 160.0f, r.getY() + 6.0f, 80.0f, 14.0f), juce::Justification::centredRight);
@@ -230,7 +230,7 @@ void TuneReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

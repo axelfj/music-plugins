@@ -88,7 +88,7 @@ void TailDisplay::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (11.0f));
-    juce::String label = Choices::modes[(int) params.mode] + "  ·  " + tr ("tamaño ", "size ") + juce::String (juce::roundToInt (params.size * 100.0f)) + " %  ·  ";
+    juce::String label = Choices::modes[(int) params.mode] + juce::String::fromUTF8 ("  ·  ") + tr ("tamaño ", "size ") + juce::String (juce::roundToInt (params.size * 100.0f)) + juce::String::fromUTF8 (" %  ·  ");
     label << (params.freeze ? tr ("FREEZE", "FREEZE") : juce::String ("RT60 ") + juce::String (params.decaySeconds, params.decaySeconds < 10.0f ? 2 : 1) + " s");
     g.drawText (label, title, juce::Justification::topLeft);
     g.drawText (tr ("nivel de la cola", "tail level"), title, juce::Justification::topRight);
@@ -199,7 +199,7 @@ void SpaceReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);

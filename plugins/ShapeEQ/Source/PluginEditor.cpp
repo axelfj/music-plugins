@@ -215,11 +215,11 @@ void EqDisplay::paint (juce::Graphics& g)
     if (selected >= 0 && params.bands[(size_t) selected].enabled)
     {
         const auto& bp = params.bands[(size_t) selected];
-        juce::String txt = Choices::types[(int) bp.type] + "  ·  " + freqLabel (bp.freq) + (bp.freq >= 1000.0 ? "Hz" : " Hz");
-        if (Choices::typeHasGain (bp.type)) txt += "  ·  " + juce::String (bp.gainDb, 1) + " dB";
-        if (Choices::typeHasSlope (bp.type)) txt += "  ·  " + juce::String (bp.slopeDb) + " dB/oct";
-        else txt += "  ·  Q " + juce::String (bp.q, 2);
-        if (bp.placement != Placement::stereo) txt += "  ·  " + Choices::placements[(int) bp.placement];
+        juce::String txt = Choices::types[(int) bp.type] + juce::String::fromUTF8 ("  ·  ") + freqLabel (bp.freq) + (bp.freq >= 1000.0 ? "Hz" : " Hz");
+        if (Choices::typeHasGain (bp.type)) txt += juce::String::fromUTF8 ("  ·  ") + juce::String (bp.gainDb, 1) + " dB";
+        if (Choices::typeHasSlope (bp.type)) txt += juce::String::fromUTF8 ("  ·  ") + juce::String (bp.slopeDb) + " dB/oct";
+        else txt += juce::String::fromUTF8 ("  ·  Q ") + juce::String (bp.q, 2);
+        if (bp.placement != Placement::stereo) txt += juce::String::fromUTF8 ("  ·  ") + Choices::placements[(int) bp.placement];
         g.setColour (bandColour (selected));
         g.setFont (juce::FontOptions (12.0f, juce::Font::bold));
         g.drawText (txt, r.withHeight (16.0f).translated (0.0f, 2.0f).reduced (6.0f, 0.0f), juce::Justification::centredRight);
@@ -569,7 +569,7 @@ void ShapeEQEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + "  ·  " + tr ("gratis y open source", "free & open source"),
+    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
                 header, juce::Justification::centredRight);
 
     g.setColour (colours::outline);
