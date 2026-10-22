@@ -28,6 +28,11 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | **Peak Ready** | Limitador true-peak con lookahead, release adaptativo, tres estilos y medidor LUFS con objetivo | Alpha |
 | **Master Check Live** | Medidor LUFS / LRA / true peak en tiempo real con los perfiles de plataforma de Master Check | Alpha |
 | **Filter Ready** | Doble filtro resonante (LP/HP/BP/notch, 12/24 dB) en serie o paralelo con LFO sincronizado, envolvente, drive y carácter Analog | Alpha |
+| **Kick Ready** | Sinte de bombos (instrumento MIDI): cuerpo con envolvente de tono, click, drive, clip, EQ, afinado a ±1 cent, exporta WAV | Alpha |
+| **Tune Ready** | Afinación de voz en tiempo real (YIN + PSOLA con formantes): escala / tonalidad, velocidad, humanize, MIDI, modo fijo con tono y formante independientes | Alpha |
+| **Vox Synth** | Armonías (hasta 4 voces por grados de escala, semitonos o MIDI), vocoder (8-32 bandas, portadora interna o sidechain, talkbox) y robot sobre el mismo motor YIN + PSOLA | Alpha |
+| **Stutter Ready** | Stutter / glitch sincronizado al tempo (1/4 a 1/128) con 8 gestos (buzz, pitch, reversa, tape stop, gate, filtro), disparo por MIDI o botones cuantizado a la rejilla, secuenciador de pasos y presets de builds | Alpha |
+| **Shimmer Ready** | Delay granular con tono por repetición (grano sincronizado al tono detectado), reversa, feedback con filtros y freeze, y reverb shimmer integrada (motor de Space Ready) | Alpha |
 
 El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 

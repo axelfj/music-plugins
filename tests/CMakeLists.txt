@@ -23,7 +23,12 @@ add_executable(dsp_tests
     test_essclean.cpp
     test_peakready.cpp
     test_mastercheck.cpp
-    test_filterready.cpp)
+    test_filterready.cpp
+    test_kickready.cpp
+    test_tuneready.cpp
+    test_voxsynth.cpp
+    test_stutterready.cpp
+    test_shimmerready.cpp)
 
 target_link_libraries(dsp_tests PRIVATE rommuser_dsp Catch2::Catch2WithMain)
 
