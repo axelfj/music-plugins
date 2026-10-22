@@ -161,19 +161,21 @@ jobs:
           slug=$(echo "$plugin" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
           echo "tag=$slug-v$version" >> "$GITHUB_OUTPUT"
           echo "prerelease=$([[ "$version" == *-* ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          # "ShapeEQ" -> "Shape EQ" for the release title.
+          echo "title=$(echo "$plugin" | sed -E 's/([a-z0-9])([A-Z])/\1 \2/g') $version" >> "$GITHUB_OUTPUT"
           mkdir -p release
           find artifacts -type f -name "$plugin*" -exec cp {} release/ \;
           ls -l release
-          python3 - "$plugin" "$version" <<'EOF'
+          python3 - "$plugin" "$version" "$base" <<'EOF'
           import re, sys
-          plugin, version = sys.argv[1:]
+          plugin, version, base = sys.argv[1:]   # installers are named after the VERSION file, not the tag
           text = open(f"plugins/{plugin}/CHANGELOG.md", encoding="utf-8").read()
           m = re.search(r"^## \[?%s\]?.*?$(.*?)(?=^## |\Z)" % re.escape(version), text, re.M | re.S)
           notes = (m.group(1).strip() if m else "") + (
               "\n\n### Descarga / Download\n\n"
-              f"- Windows: `{plugin}-Setup-{version}.exe` (VST3 + CLAP)\n"
-              f"- macOS: `{plugin}-{version}.pkg` (VST3 + AU + CLAP, Intel y Apple silicon)\n"
-              f"- Linux: `{plugin}-*-linux-x86_64.tar.gz`\n\n"
+              f"- Windows: `{plugin}-Setup-{base}.exe` (VST3 + CLAP)\n"
+              f"- macOS: `{plugin}-{base}.pkg` (VST3 + AU + CLAP, Intel y Apple silicon)\n"
+              f"- Linux: `{plugin}-{base}-linux-x86_64.tar.gz`\n\n"
               "Los instaladores todavia no estan firmados. En macOS, el README explica como abrirlos la primera vez. / "
               "The installers are not code-signed yet; see the README for the first-launch steps on macOS.\n")
           open("notes.md", "w", encoding="utf-8").write(notes)
@@ -182,7 +184,7 @@ jobs:
         with:
           tag_name: ${{ steps.prep.outputs.tag }}
           target_commitish: ${{ github.sha }}
-          name: ${{ inputs.plugin }} ${{ inputs.version }}
+          name: ${{ steps.prep.outputs.title }}
           prerelease: ${{ steps.prep.outputs.prerelease == 'true' }}
           body_path: notes.md
           files: release/*
