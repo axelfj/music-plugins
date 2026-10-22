@@ -46,6 +46,7 @@ if(MUSIC_PLUGINS_BUILD_PLUGINS)
     add_subdirectory(plugins/SpaceReady)
     add_subdirectory(plugins/ResTame)
     add_subdirectory(plugins/LowMono)
+    add_subdirectory(plugins/PunchShape)
 endif()
 
 if(MUSIC_PLUGINS_BUILD_TESTS)
