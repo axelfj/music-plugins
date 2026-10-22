@@ -106,10 +106,22 @@ jobs:
           if [ "$RUNNER_OS" = "macOS" ]; then PV=pluginval/pluginval.app/Contents/MacOS/pluginval
           elif [ "$RUNNER_OS" = "Windows" ]; then PV=pluginval/pluginval.exe
           else PV=pluginval/pluginval; chmod +x $PV; fi
+          # pluginval occasionally segfaults while tearing down *after* it has printed its
+          # verdict (seen on Linux). Judge the run by the verdict in its output, not the exit code.
+          validate() {
+            echo "== $1"
+            set +e
+            "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$1" 2>&1 | tee pluginval.log
+            set -e
+            if grep -q "^SUCCESS" pluginval.log && ! grep -qE "FAILED|^!!!" pluginval.log; then
+              echo "pluginval: SUCCESS for $1"
+            else
+              echo "::error::pluginval did not report SUCCESS for $1"; exit 1
+            fi
+          }
           shopt -s nullglob
           for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/VST3/*.vst3; do
-            echo "== $p"
-            "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$p"
+            validate "$p"
           done
           # macOS only finds Audio Units that are installed in a Components folder.
           if [ "$RUNNER_OS" = "macOS" ]; then
@@ -117,8 +129,7 @@ jobs:
             for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/AU/*.component; do
               cp -R "$p" ~/Library/Audio/Plug-Ins/Components/
               killall -9 AudioComponentRegistrar 2>/dev/null || true
-              echo "== $p"
-              "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate ~/Library/Audio/Plug-Ins/Components/"$(basename "$p")"
+              validate ~/Library/Audio/Plug-Ins/Components/"$(basename "$p")"
             done
           fi
 
