@@ -37,7 +37,9 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 | **Chord Ready** | Herramienta MIDI (instrumento): una tecla = un acorde completo. Por escala (tonalidad + 10 escalas, 7ª/9ª, snap) o 20 tipos fijos, 4 voicings, inversiones, octavas, strum con dirección, suavizado y humanize, sonido interno para oírlo al instante y 10 presets | Alpha |
 | **Arp Ready** | Arpegiador MIDI (instrumento): 7 modos (incl. acorde y aleatorio), 15 velocidades con puntillo/tresillo, 1-4 octavas, gate, swing, patrón de 16 pasos, latch, acento, sincronizado a la rejilla del DAW, sonido interno y 10 presets | Alpha |
 
-El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
+La siguiente generación está descrita en [V2 y V3](docs/V2_V3_ROADMAP.md). V2 está en desarrollo; los releases actuales siguen siendo alpha.
+
+El plan original está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 
 ## Instalar
 
@@ -85,3 +87,4 @@ Cada plugin se versiona por separado: `plugins/<Name>/VERSION` guarda la versió
 ## Contribuir
 
 Issues y pull requests son bienvenidos. Antes de proponer un plugin nuevo revisa el [roadmap](https://github.com/axelfj/music-plugins/issues/1). Nunca copiamos nombres, logos ni diseño visual de plugins comerciales.
+

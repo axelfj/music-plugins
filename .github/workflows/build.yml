@@ -37,6 +37,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - name: Test validation gate
+        if: runner.os == 'Linux'
+        run: python3 -m unittest discover -s tests -p test_validation_gate.py -v
       - name: Configure
         run: cmake -S . -B build-tests -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DMUSIC_PLUGINS_BUILD_PLUGINS=OFF
       - name: Build
@@ -107,27 +110,14 @@ jobs:
           if [ "$RUNNER_OS" = "macOS" ]; then PV=pluginval/pluginval.app/Contents/MacOS/pluginval
           elif [ "$RUNNER_OS" = "Windows" ]; then PV=pluginval/pluginval.exe
           else PV=pluginval/pluginval; chmod +x $PV; fi
-          # pluginval occasionally segfaults while tearing down the in-process plugin (seen on
-          # Linux): sometimes after it has printed its verdict, sometimes just before, with every
-          # test group already completed. Judge the run by the verdict in its output, not the exit
-          # code; a crash with no verdict and no failed test is retried (up to 3 attempts), a
-          # reported failure is final.
           validate() {
-            echo "== $1"
-            for attempt in 1 2 3; do
-              set +e
-              "$PV" --strictness-level 10 --validate-in-process --skip-gui-tests --validate "$1" 2>&1 | tee pluginval.log
-              set -e
-              if grep -qE "^FAILURE|^\*\*\* FAILED|!!! Test" pluginval.log; then
-                echo "::error::pluginval reported a failure for $1"; exit 1
-              elif grep -q "^SUCCESS" pluginval.log; then
-                echo "pluginval: SUCCESS for $1"; return 0
-              fi
-              echo "::warning::pluginval exited without a verdict for $1 (attempt $attempt), retrying"
-            done
-            echo "::error::pluginval did not report SUCCESS for $1"; exit 1
+            local name
+            name=$(basename "$1")
+            bash scripts/validate-plugin.sh "$PV" "$1" "validation-logs/$name.log"
           }
           shopt -s nullglob
+          bundles=(build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/VST3/*.vst3)
+          [ "${#bundles[@]}" -gt 0 ] || { echo "::error::No VST3 bundles to validate"; exit 1; }
           for p in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}/VST3/*.vst3; do
             validate "$p"
           done
@@ -140,6 +130,14 @@ jobs:
               validate ~/Library/Audio/Plug-Ins/Components/"$(basename "$p")"
             done
           fi
+
+      - name: Preserve plugin validation logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-${{ matrix.name }}
+          path: validation-logs/*
+          if-no-files-found: warn
 
       - name: Package (Windows installer)
         if: runner.os == 'Windows'
@@ -178,6 +176,7 @@ jobs:
         with:
           name: ${{ matrix.name }}
           path: dist/*
+          if-no-files-found: error
 
   release:
     name: Release ${{ inputs.plugin }} ${{ inputs.version }}
@@ -191,8 +190,13 @@ jobs:
           path: artifacts
       - name: Check version and collect files
         id: prep
+        env:
+          RELEASE_PLUGIN: ${{ inputs.plugin }}
+          RELEASE_VERSION: ${{ inputs.version }}
         run: |
-          plugin="${{ inputs.plugin }}"; version="${{ inputs.version }}"
+          plugin="$RELEASE_PLUGIN"; version="$RELEASE_VERSION"
+          [[ "$plugin" =~ ^[A-Za-z][A-Za-z0-9]*$ ]] && [ -d "plugins/$plugin" ] || { echo "::error::Unknown plugin"; exit 1; }
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$ ]] || { echo "::error::Invalid version"; exit 1; }
           base=$(head -n1 "plugins/$plugin/VERSION")
           if [ "$version" != "$base" ]; then echo "::error::$version does not match plugins/$plugin/VERSION ($base); bump VERSION first"; exit 1; fi
           slug=$(echo "$plugin" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
@@ -207,12 +211,15 @@ jobs:
           for f in "$plugin-Setup-$version.exe" "$plugin-$version.pkg" "$plugin-$version-linux-x86_64.tar.gz"; do
             [ -f "release/$f" ] || { echo "::error::missing asset $f"; exit 1; }
           done
+          (cd release && sha256sum "$plugin-Setup-$version.exe" "$plugin-$version.pkg" "$plugin-$version-linux-x86_64.tar.gz" > SHA256SUMS)
           python3 - "$plugin" "$version" <<'EOF'
           import re, sys
           plugin, version = sys.argv[1:]
           text = open(f"plugins/{plugin}/CHANGELOG.md", encoding="utf-8").read()
           m = re.search(r"^## \[?%s\]?.*?$(.*?)(?=^## |\Z)" % re.escape(version), text, re.M | re.S)
-          notes = (m.group(1).strip() if m else "") + (
+          if not m or not m.group(1).strip():
+              raise SystemExit("Release requires nonempty version-specific changelog notes")
+          notes = m.group(1).strip() + (
               "\n\n### Descarga / Download\n\n"
               f"- Windows: `{plugin}-Setup-{version}.exe` (VST3 + CLAP)\n"
               f"- macOS: `{plugin}-{version}.pkg` (VST3 + AU + CLAP, Intel y Apple silicon)\n"
@@ -229,3 +236,4 @@ jobs:
           prerelease: ${{ steps.prep.outputs.prerelease == 'true' }}
           body_path: notes.md
           files: release/*
+
