@@ -41,6 +41,67 @@ Cada nombre dice qué hace el plugin, y la **R** es de ROMMUSER. *Each name says
 
 El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 
+## Vista previa
+
+Así se ven por dentro antes de instalarlos. Son capturas reales de cada plugin con audio pasando, generadas desde el código con [`tools/screenshot`](tools/screenshot/render.sh). Haz clic en una para verla en grande.
+
+*What each plugin looks like before you install it: real renders of every editor with audio running. Click one to see it full size.*
+
+<table>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/clip-ready.png"><img src="docs/screenshots/clip-ready.png" alt="Clipper-R"></a><br><b>Clipper-R</b> · Clipper</td>
+<td width="50%" align="center"><a href="docs/screenshots/shape-eq.png"><img src="docs/screenshots/shape-eq.png" alt="EQ-R"></a><br><b>EQ-R</b> · EQ</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/press-ready.png"><img src="docs/screenshots/press-ready.png" alt="Compressor-R"></a><br><b>Compressor-R</b> · Compresor</td>
+<td width="50%" align="center"><a href="docs/screenshots/duck-ready.png"><img src="docs/screenshots/duck-ready.png" alt="Sidechain-R"></a><br><b>Sidechain-R</b> · Sidechain</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/band-push.png"><img src="docs/screenshots/band-push.png" alt="Multiband-R"></a><br><b>Multiband-R</b> · Multibanda</td>
+<td width="50%" align="center"><a href="docs/screenshots/warm-drive.png"><img src="docs/screenshots/warm-drive.png" alt="Saturator-R"></a><br><b>Saturator-R</b> · Saturación</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/gate-ready.png"><img src="docs/screenshots/gate-ready.png" alt="Gate-R"></a><br><b>Gate-R</b> · Gate</td>
+<td width="50%" align="center"><a href="docs/screenshots/echo-ready.png"><img src="docs/screenshots/echo-ready.png" alt="Delay-R"></a><br><b>Delay-R</b> · Delay</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/phase-ready.png"><img src="docs/screenshots/phase-ready.png" alt="Phaser-R"></a><br><b>Phaser-R</b> · Phaser</td>
+<td width="50%" align="center"><a href="docs/screenshots/wide-ready.png"><img src="docs/screenshots/wide-ready.png" alt="Chorus-R"></a><br><b>Chorus-R</b> · Chorus / flanger</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/space-ready.png"><img src="docs/screenshots/space-ready.png" alt="Reverb-R"></a><br><b>Reverb-R</b> · Reverb</td>
+<td width="50%" align="center"><a href="docs/screenshots/res-tame.png"><img src="docs/screenshots/res-tame.png" alt="Resonance-R"></a><br><b>Resonance-R</b> · Resonancias</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/low-mono.png"><img src="docs/screenshots/low-mono.png" alt="Stereo-R"></a><br><b>Stereo-R</b> · Imagen estéreo</td>
+<td width="50%" align="center"><a href="docs/screenshots/punch-shape.png"><img src="docs/screenshots/punch-shape.png" alt="Transient-R"></a><br><b>Transient-R</b> · Transientes</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/ess-clean.png"><img src="docs/screenshots/ess-clean.png" alt="De-Esser-R"></a><br><b>De-Esser-R</b> · De-esser</td>
+<td width="50%" align="center"><a href="docs/screenshots/peak-ready.png"><img src="docs/screenshots/peak-ready.png" alt="Limiter-R"></a><br><b>Limiter-R</b> · Limitador</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/master-check-live.png"><img src="docs/screenshots/master-check-live.png" alt="Meter-R"></a><br><b>Meter-R</b> · Medidor LUFS</td>
+<td width="50%" align="center"><a href="docs/screenshots/filter-ready.png"><img src="docs/screenshots/filter-ready.png" alt="Filter-R"></a><br><b>Filter-R</b> · Filtro</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/kick-ready.png"><img src="docs/screenshots/kick-ready.png" alt="Kick-R"></a><br><b>Kick-R</b> · Sinte de bombos</td>
+<td width="50%" align="center"><a href="docs/screenshots/tune-ready.png"><img src="docs/screenshots/tune-ready.png" alt="Tune-R"></a><br><b>Tune-R</b> · Afinación de voz</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/vox-synth.png"><img src="docs/screenshots/vox-synth.png" alt="Vocoder-R"></a><br><b>Vocoder-R</b> · Armonías / vocoder</td>
+<td width="50%" align="center"><a href="docs/screenshots/stutter-ready.png"><img src="docs/screenshots/stutter-ready.png" alt="Stutter-R"></a><br><b>Stutter-R</b> · Stutter / glitch</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/shimmer-ready.png"><img src="docs/screenshots/shimmer-ready.png" alt="Pitch Delay-R"></a><br><b>Pitch Delay-R</b> · Delay con tono</td>
+<td width="50%" align="center"><a href="docs/screenshots/wave-ready.png"><img src="docs/screenshots/wave-ready.png" alt="Synth-R"></a><br><b>Synth-R</b> · Sintetizador</td>
+</tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/chord-ready.png"><img src="docs/screenshots/chord-ready.png" alt="Chord-R"></a><br><b>Chord-R</b> · Acordes MIDI</td>
+<td width="50%" align="center"><a href="docs/screenshots/arp-ready.png"><img src="docs/screenshots/arp-ready.png" alt="Arpeggiator-R"></a><br><b>Arpeggiator-R</b> · Arpegiador MIDI</td>
+</tr>
+</table>
+
 ## Instalar
 
 Descarga la última versión desde [Releases](https://github.com/axelfj/music-plugins/releases). Cada archivo lleva el nombre del plugin, por ejemplo `EQ-R-Setup-1.0.0-alpha.2.exe`.
@@ -65,6 +126,8 @@ ctest --test-dir build --output-on-failure   # pruebas de DSP
 
 Los plugins quedan en `build/plugins/<Plugin>/<Plugin>_artefacts/Release/`. JUCE, clap-juce-extensions y Catch2 se descargan solos la primera vez.
 
+Si cambias una interfaz, vuelve a generar las capturas de la vista previa con `tools/screenshot/render.sh` (en Linux usa `xvfb-run` si no hay pantalla). Compila una pequeña app por plugin que abre el editor, le pasa audio de prueba (o un acorde a los instrumentos) y lo guarda en `docs/screenshots/<plugin>.png`.
+
 ## Estructura
 
 ```
@@ -73,6 +136,8 @@ shared/ui/       Look & feel común y textos bilingües
 plugins/<Name>/  Un plugin por carpeta: VERSION, CHANGELOG.md, Source/
 tests/           Pruebas de DSP (Catch2): respuesta, aliasing, latencia, nulos
 installer/       Inno Setup (Windows) y pkgbuild (macOS)
+tools/screenshot Renderiza la interfaz de cada plugin a PNG para la vista previa
+docs/screenshots Las capturas que muestra este README
 cmake/           music_plugin() helper
 ```
 
