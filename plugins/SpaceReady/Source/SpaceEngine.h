@@ -181,6 +181,17 @@ public:
         // LFO rates per line (Hz), slow and mutually different.
         static constexpr float lfoRates[numLines] = { 0.11f, 0.17f, 0.23f, 0.29f, 0.13f, 0.19f, 0.31f, 0.37f };
 
+        // The line LFOs run as rotating phasors (two multiply-adds per sample instead of a sin call),
+        // re-seeded from the exact phase at every block so rounding can never drift.
+        float lfoSin[numLines], lfoCos[numLines], rotSin[numLines], rotCos[numLines];
+        for (int k = 0; k < numLines; ++k)
+        {
+            const double w = 6.283185307179586 * lfoRates[k] / sampleRate;
+            const double a = 6.283185307179586 * lfoPhase[(size_t) k];
+            lfoSin[k] = (float) std::sin (a); lfoCos[k] = (float) std::cos (a);
+            rotSin[k] = (float) std::sin (w); rotCos[k] = (float) std::cos (w);
+        }
+
         for (int i = 0; i < n; ++i)
         {
             const float size = sizeSmooth.next();
@@ -209,6 +220,14 @@ public:
             inL *= inGain * 0.5f;
             inR *= inGain * 0.5f;
 
+            // The decay gains only change while Size or Decay move: recompute them only then.
+            if (size != gainsSize || decaySeconds != gainsDecay || params.freeze != gainsFrozen)
+            {
+                for (int k = 0; k < numLines; ++k)
+                    gains[(size_t) k] = lineGain (profile.lengthsMs[k] * size * 0.001f * (float) sampleRate);
+                gainsSize = size; gainsDecay = decaySeconds; gainsFrozen = params.freeze;
+            }
+
             // Read the eight lines (modulated), damp and apply the decay gain.
             float y[numLines];
             for (int k = 0; k < numLines; ++k)
@@ -217,13 +236,16 @@ public:
                 auto& ph = lfoPhase[(size_t) k];
                 ph += lfoRates[k] / sampleRate;
                 if (ph >= 1.0) ph -= 1.0;
-                const float mod = modDepth * std::sin (6.283185307179586f * (float) ph);
+                const float sNext = lfoSin[k] * rotCos[k] + lfoCos[k] * rotSin[k];
+                lfoCos[k] = lfoCos[k] * rotCos[k] - lfoSin[k] * rotSin[k];
+                lfoSin[k] = sNext;
+                const float mod = modDepth * sNext;
                 // Frozen: read whole samples so the interpolation cannot slowly dull the held tail.
                 const float v = params.freeze ? lines[(size_t) k].readInteger ((int) std::lround (lengthSamples))
                                               : lines[(size_t) k].read (std::max (2.0f, lengthSamples + mod));
                 auto& s = dampState[(size_t) k];
                 s += dampCoef * (v - s);
-                y[k] = s * lineGain (lengthSamples);
+                y[k] = s * gains[(size_t) k];
             }
 
             // Hadamard (orthogonal) feedback mixing, 1/sqrt(8).
@@ -288,6 +310,9 @@ private:
     std::array<std::array<DiffuserStage, 4>, (size_t) maxChannels> diffusers;
     std::array<float, (size_t) numLines> dampState {};
     std::array<double, (size_t) numLines> lfoPhase {};
+    std::array<float, (size_t) numLines> gains {};
+    float gainsSize = -1.0f, gainsDecay = -1.0f;
+    bool gainsFrozen = false;
     std::array<dsp::Biquad, (size_t) maxChannels> lowCut, highCut;
 
     float dampCoef = 1.0f, decaySeconds = 2.0f;

@@ -93,12 +93,17 @@ public:
         sr = sampleRate;
         half = (int) std::ceil (sr / std::clamp ((double) minHz, 30.0, 200.0));   // one period of the lowest pitch
         window = 2 * half;
+        // Circular correlation of length N >= window has no wrap-around for the lags we read:
+        // j < half and tau < half, so j + tau < window. (window + half would only pad zeros.)
         int order = 1;
-        while ((1 << order) < window + half) ++order;
+        while ((1 << order) < window) ++order;
         fft.prepare (order);
         fftSize = 1 << order;
         a.resize ((size_t) fftSize);
         b.resize ((size_t) fftSize);
+        work.resize ((size_t) fftSize);
+        realA.resize ((size_t) fftSize);
+        realB.resize ((size_t) fftSize);
         d.resize ((size_t) half);
         prefix.resize ((size_t) window + 1);
         tauMin = std::max (2, (int) std::floor (sr / maxDetectHz));
@@ -115,15 +120,19 @@ public:
         if (energyY < (double) half * 1e-8)   // below ~ -80 dBFS rms
             return est;
 
-        // r(tau) = sum_{j<half} x[j] x[j+tau] via FFT correlation.
+        // r(tau) = sum_{j<half} x[j] x[j+tau] via FFT correlation. Both inputs are real, so one
+        // complex FFT transforms the two of them; the product is written out by hand.
         for (int i = 0; i < fftSize; ++i)
         {
-            a[(size_t) i] = i < window ? FFT::Complex (x[i], 0.0f) : FFT::Complex (0.0f, 0.0f);
-            b[(size_t) i] = i < half ? FFT::Complex (x[i], 0.0f) : FFT::Complex (0.0f, 0.0f);
+            realA[(size_t) i] = i < window ? x[i] : 0.0f;
+            realB[(size_t) i] = i < half ? x[i] : 0.0f;
         }
-        fft.forward (a.data());
-        fft.forward (b.data());
-        for (int i = 0; i < fftSize; ++i) a[(size_t) i] *= std::conj (b[(size_t) i]);
+        fft.forwardTwoReal (realA.data(), realB.data(), work.data(), a.data(), b.data());
+        for (int i = 0; i < fftSize; ++i)
+        {
+            const auto p = a[(size_t) i], q = b[(size_t) i]; // p * conj (q)
+            a[(size_t) i] = { p.real() * q.real() + p.imag() * q.imag(), p.imag() * q.real() - p.real() * q.imag() };
+        }
         fft.inverse (a.data());
 
         // Difference function and cumulative mean normalisation.
@@ -174,7 +183,8 @@ private:
     int window = 2048, half = 1024, fftSize = 4096, tauMin = 40;
     float threshold = 0.1f, voicedThreshold = 0.25f;
     FFT fft;
-    std::vector<FFT::Complex> a, b;
+    std::vector<FFT::Complex> a, b, work;
+    std::vector<float> realA, realB;
     std::vector<float> d;
     std::vector<double> prefix;
 };

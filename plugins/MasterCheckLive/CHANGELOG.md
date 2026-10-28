@@ -5,6 +5,7 @@
 - Nuevo nombre: **Meter-R** (antes Master Check Live). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Meter-R** (formerly Master Check Live): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Master Check Live deberían abrir con Meter-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Master Check Live should open with Meter-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Master Check Live" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Master Check Live" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
+- Menos CPU: medidor true-peak ~3.4x más rápido (1.6 % → 0.5 % de un núcleo), misma lectura. / Less CPU: ~3.4x faster true-peak metering, same reading.
 
 ## 1.0.0-alpha.1
 

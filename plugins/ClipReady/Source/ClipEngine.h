@@ -185,18 +185,19 @@ private:
 
             float* hi = os.upsample (pre.data(), n);
             {
+                float maxOver = 1.0f; // largest |v| above the ceiling; one log10 per block, not per sample
                 for (int i = 0; i < n; ++i)
                 {
                     const float soft = sSoft.next();
                     for (int k = 0; k < factor; ++k)
                     {
                         float& v = hi[i * factor + k];
-                        const float over = std::fabs (v);
-                        if (over > 1.0f)
-                            meters.clipDb = std::max (meters.clipDb, 20.0f * std::log10 (over));
+                        maxOver = std::max (maxOver, std::fabs (v));
                         v = clipCurve (v, soft);
                     }
                 }
+                if (maxOver > 1.0f)
+                    meters.clipDb = std::max (meters.clipDb, 20.0f * std::log10 (maxOver));
             }
 
             // Reuse 'pre' as the downsampled wet buffer; the ceiling ramp lives in 'wet'.
