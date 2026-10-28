@@ -11,6 +11,7 @@ endif()
 
 option(MUSIC_PLUGINS_BUILD_PLUGINS "Build the plugins (needs JUCE, fetched automatically)" ON)
 option(MUSIC_PLUGINS_BUILD_TESTS "Build the headless DSP tests" ON)
+option(MUSIC_PLUGINS_BUILD_SCREENSHOTS "Build <Plugin>_Screenshot apps that render each editor to a PNG (README gallery)" OFF)
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET OFF)
