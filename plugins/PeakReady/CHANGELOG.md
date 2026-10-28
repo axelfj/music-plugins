@@ -3,8 +3,8 @@
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Limiter-R** (antes Peak Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Limiter-R** (formerly Peak Ready): the name now says what the plugin does; the R stands for ROMMUSER.
-- Los proyectos guardados con Peak Ready abren igual con Limiter-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Peak Ready open with Limiter-R and keep their settings (same plugin ID).
-- El instalador borra la copia vieja llamada "Peak Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Peak Ready" copy so the DAW does not list the plugin twice.
+- Los proyectos guardados con Peak Ready deberían abrir con Limiter-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Peak Ready should open with Limiter-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Peak Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Peak Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

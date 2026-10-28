@@ -3,8 +3,8 @@
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Saturator-R** (antes Warm Drive). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Saturator-R** (formerly Warm Drive): the name now says what the plugin does; the R stands for ROMMUSER.
-- Los proyectos guardados con Warm Drive abren igual con Saturator-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Warm Drive open with Saturator-R and keep their settings (same plugin ID).
-- El instalador borra la copia vieja llamada "Warm Drive" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Warm Drive" copy so the DAW does not list the plugin twice.
+- Los proyectos guardados con Warm Drive deberían abrir con Saturator-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Warm Drive should open with Saturator-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Warm Drive" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Warm Drive" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

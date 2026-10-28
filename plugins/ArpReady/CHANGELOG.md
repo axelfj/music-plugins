@@ -3,8 +3,8 @@
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Arpeggiator-R** (antes Arp Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Arpeggiator-R** (formerly Arp Ready): the name now says what the plugin does; the R stands for ROMMUSER.
-- Los proyectos guardados con Arp Ready abren igual con Arpeggiator-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Arp Ready open with Arpeggiator-R and keep their settings (same plugin ID).
-- El instalador borra la copia vieja llamada "Arp Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Arp Ready" copy so the DAW does not list the plugin twice.
+- Los proyectos guardados con Arp Ready deberían abrir con Arpeggiator-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Arp Ready should open with Arpeggiator-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Arp Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Arp Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

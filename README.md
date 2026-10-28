@@ -8,7 +8,7 @@ Hechos por [ROMMUSER](https://rommuser.com). Licencia [GPL-3.0](LICENSE). Si qui
 
 ## Plugins
 
-Cada nombre dice qué hace el plugin, y la **R** es de ROMMUSER. *Each name says what the plugin does; the R stands for ROMMUSER.* Los proyectos guardados con el nombre anterior abren igual (mismo ID de plugin).
+Cada nombre dice qué hace el plugin, y la **R** es de ROMMUSER. *Each name says what the plugin does; the R stands for ROMMUSER.* Los proyectos guardados con el nombre anterior deberían abrir igual, porque el ID del plugin no cambió; si tu DAW no lo encuentra, vuelve a escanear los plugins.
 
 | Plugin | Antes | Qué hace | Estado |
 | --- | --- | --- | --- |
@@ -49,7 +49,7 @@ Descarga la última versión desde [Releases](https://github.com/axelfj/music-pl
 
 **macOS:** abre `<Plugin>-<versión>.pkg`. Si macOS dice que no se puede abrir porque es de un desarrollador no identificado: clic derecho → *Abrir*, o ve a *Ajustes del Sistema → Privacidad y seguridad* y pulsa *Abrir de todas formas*. Después reinicia el DAW. (Logic/GarageBand usan el AU; Ableton y FL usan el VST3.)
 
-**Linux:** descomprime el `.tar.gz` en `~/.vst3/` y `~/.clap/`.
+**Linux:** descomprime el `.tar.gz` en `~/.vst3/` y `~/.clap/`. Si tenías la versión con el nombre anterior (por ejemplo `Clip Ready.vst3`), bórrala de esas carpetas para que el DAW no muestre el plugin dos veces.
 
 Luego, en tu DAW, vuelve a escanear los plugins.
 

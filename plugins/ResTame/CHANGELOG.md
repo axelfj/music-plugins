@@ -3,8 +3,8 @@
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Resonance-R** (antes Res Tame). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Resonance-R** (formerly Res Tame): the name now says what the plugin does; the R stands for ROMMUSER.
-- Los proyectos guardados con Res Tame abren igual con Resonance-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Res Tame open with Resonance-R and keep their settings (same plugin ID).
-- El instalador borra la copia vieja llamada "Res Tame" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Res Tame" copy so the DAW does not list the plugin twice.
+- Los proyectos guardados con Res Tame deberían abrir con Resonance-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Res Tame should open with Resonance-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Res Tame" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Res Tame" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

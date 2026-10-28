@@ -3,8 +3,8 @@
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Vocoder-R** (antes Vox Synth). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Vocoder-R** (formerly Vox Synth): the name now says what the plugin does; the R stands for ROMMUSER.
-- Los proyectos guardados con Vox Synth abren igual con Vocoder-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Vox Synth open with Vocoder-R and keep their settings (same plugin ID).
-- El instalador borra la copia vieja llamada "Vox Synth" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Vox Synth" copy so the DAW does not list the plugin twice.
+- Los proyectos guardados con Vox Synth deberían abrir con Vocoder-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Vox Synth should open with Vocoder-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Vox Synth" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Vox Synth" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

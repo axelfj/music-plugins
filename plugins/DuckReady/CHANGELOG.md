@@ -3,8 +3,8 @@
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Sidechain-R** (antes Duck Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Sidechain-R** (formerly Duck Ready): the name now says what the plugin does; the R stands for ROMMUSER.
-- Los proyectos guardados con Duck Ready abren igual con Sidechain-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Duck Ready open with Sidechain-R and keep their settings (same plugin ID).
-- El instalador borra la copia vieja llamada "Duck Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Duck Ready" copy so the DAW does not list the plugin twice.
+- Los proyectos guardados con Duck Ready deberían abrir con Sidechain-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Duck Ready should open with Sidechain-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Duck Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Duck Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

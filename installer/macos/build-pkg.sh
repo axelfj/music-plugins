@@ -39,12 +39,28 @@ SCRIPT
         chmod +x "$scripts/preinstall"
     fi
 
+    # All three bundles share CFBundleIdentifier com.rommuser.<slug> with the old-named install.
+    # By default pkgbuild marks bundles relocatable, so Installer would put the new bundle where
+    # it finds the old one (under the old name, or a bundle of another format) instead of at
+    # its path in the payload. Install every bundle at its own path, and since alpha builds all
+    # carry numeric version 1.0.0, always replace what is there.
+    plist="$root.plist"
+    pkgbuild --analyze --root "$root" "$plist"
+    i=0
+    while plutil -extract "$i" xml1 -o /dev/null "$plist" 2>/dev/null; do
+        plutil -replace "$i.BundleIsRelocatable" -bool NO "$plist"
+        plutil -replace "$i.BundleIsVersionChecked" -bool NO "$plist"
+        i=$((i + 1))
+    done
+    [ "$i" -ge 3 ] || { echo "expected VST3, AU and CLAP bundles in the component plist, got $i" >&2; exit 1; }
+
     pkgbuild --root "$root" \
+             --component-plist "$plist" \
              --scripts "$scripts" \
              --identifier "com.rommuser.$slug" \
              --version "$numeric" \
              --install-location / \
              "$out/${product// /}-$version.pkg"
-    rm -rf "$root" "$scripts"
+    rm -rf "$root" "$scripts" "$plist"
 done
 ls -l "$out"
