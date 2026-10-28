@@ -5,6 +5,8 @@
 // Signal flow per channel:
 //   x -> * (inGain / ceiling) -> upsample -> curve -> downsample -> [strict: clip at 1] -> * ceiling = wet
 //   x -> delay(latency) = dry
+//   HQ: the curve runs with ADAA (shared/dsp/Adaa.h) and a compensation filter that keeps the audio
+//       band flat; latency grows by 2 base-rate samples at 2x, 1 at 4x and 8x; the dry path follows.
 //   out = outGain * (mix * wet * linkComp + (1 - mix) * dry)          (normal)
 //         -> with strictCeiling the final sample is clamped to +-ceiling as well
 //   out = outGain * (dry * inGain - wet) * linkComp                   (delta: only what gets clipped, unlimited)
@@ -12,6 +14,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 
+#include "../../../shared/dsp/Adaa.h"
 #include "../../../shared/dsp/Oversampler.h"
 #include "../../../shared/dsp/Smoothing.h"
 
@@ -35,6 +38,7 @@ struct ClipParams
     bool delta = false;
     bool gainLink = false;    // output follows -input so loudness stays comparable
     bool strictCeiling = true; // hard-limit wet after downsampling AND the final output (incl. Mix/Output), so the sample peak never passes the ceiling
+    bool hq = false;           // antiderivative antialiasing on top of oversampling (shared/dsp/Adaa.h)
 };
 
 struct ClipMeters
@@ -60,6 +64,22 @@ inline float clipCurve (float x, float softness)
     return x > 0.0f ? y : -y;
 }
 
+// Antiderivative of clipCurve (for HQ mode), in double. The curve is odd, so this is even:
+//   |x| <= t:  x^2 / 2
+//   |x| >  t:  t^2 / 2 + t (|x| - t) + w^2 log cosh ((|x| - t) / w)       (w = softness)
+//   hard clip: |x| - 1/2 above 1
+inline double clipCurveAntiderivative (double x, double softness)
+{
+    const double t = 1.0 - softness;
+    const double a = std::fabs (x);
+    if (a <= t)
+        return 0.5 * x * x;
+    if (softness <= 1.0e-6)
+        return a - 0.5;
+    const double w = 1.0 - t;
+    return 0.5 * t * t + t * (a - t) + w * w * dsp::logCosh ((a - t) / w);
+}
+
 class ClipEngine
 {
 public:
@@ -80,7 +100,7 @@ public:
                 oversamplers[(size_t) c][f]->prepare (factors[f], maxBlockSize);
                 maxLatency = std::max (maxLatency, oversamplers[(size_t) c][f]->getLatencySamples());
             }
-            dryDelay[(size_t) c].setMaxDelay (maxLatency);
+            dryDelay[(size_t) c].setMaxDelay (maxLatency + 2); // + 2: HQ compensation (2x)
         }
 
         pre.assign ((size_t) maxBlockSize, 0.0f);
@@ -101,11 +121,14 @@ public:
                 if (o)
                     o->reset();
             dryDelay[(size_t) c].reset();
+            adaa[(size_t) c].reset();
+            hqComp[(size_t) c].reset();
         }
     }
 
     void setParams (const ClipParams& p, bool immediate = false)
     {
+        const bool hqChanged = p.hq != params.hq;
         params = p;
 
         int idx = 2;
@@ -113,10 +136,15 @@ public:
             if (factors[f] == p.oversampling)
                 idx = (int) f;
 
-        if (idx != currentFactorIndex)
+        if (idx != currentFactorIndex || hqChanged)
         {
             currentFactorIndex = idx;
-            const int lat = oversamplers[0u][(size_t) idx] ? oversamplers[0u][(size_t) idx]->getLatencySamples() : 0;
+            for (int c = 0; c < maxChannels; ++c)
+            {
+                adaa[(size_t) c].reset();
+                hqComp[(size_t) c].prepare (factors[(size_t) idx]);
+            }
+            const int lat = getLatencySamples();
             for (int c = 0; c < maxChannels; ++c)
             {
                 dryDelay[(size_t) c].setDelay (lat);
@@ -140,7 +168,7 @@ public:
     int getLatencySamples() const
     {
         const auto& o = oversamplers[0u][(size_t) std::max (0, currentFactorIndex)];
-        return o ? o->getLatencySamples() : 0;
+        return (o ? o->getLatencySamples() : 0) + (params.hq ? hqComp[0].getLatencyBaseSamples() : 0);
     }
 
     // Processes numChannels buffers of n samples in place. n must not exceed the prepared block size;
@@ -184,6 +212,7 @@ private:
             }
 
             float* hi = os.upsample (pre.data(), n);
+            const bool hq = params.hq;
             {
                 float maxOver = 1.0f; // largest |v| above the ceiling; one log10 per block, not per sample
                 for (int i = 0; i < n; ++i)
@@ -193,7 +222,18 @@ private:
                     {
                         float& v = hi[i * factor + k];
                         maxOver = std::max (maxOver, std::fabs (v));
-                        v = clipCurve (v, soft);
+                        if (hq)
+                        {
+                            const double sd = soft;
+                            v = adaa[ci].process (v,
+                                                  [sd] (double u) { return (double) clipCurve ((float) u, (float) sd); },
+                                                  [sd] (double u) { return clipCurveAntiderivative (u, sd); });
+                            v = hqComp[ci].process (v); // flat again in the audio band, whole-sample delay
+                        }
+                        else
+                        {
+                            v = clipCurve (v, soft);
+                        }
                     }
                 }
                 if (maxOver > 1.0f)
@@ -252,6 +292,8 @@ private:
     int channels = 2, blockSize = 512, currentFactorIndex = -1;
     std::array<std::array<std::unique_ptr<dsp::Oversampler>, 4>, (size_t) maxChannels> oversamplers;
     std::array<dsp::DelayLine, (size_t) maxChannels> dryDelay;
+    std::array<dsp::Adaa1, (size_t) maxChannels> adaa;
+    std::array<dsp::AdaaCompensator, (size_t) maxChannels> hqComp;
     std::vector<float> pre, wet;
     dsp::LinearSmoother inGain, ceiling, outGain, mix, softness, linkComp;
 };

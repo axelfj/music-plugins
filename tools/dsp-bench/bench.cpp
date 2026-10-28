@@ -115,9 +115,23 @@ int main (int argc, char** argv)
         benches.push_back ({ "Clipper-R (+12 dB, 8x)", [] (float* const* io, int n) { e.process (io, 2, n); } });
     }
     {
+        static rommuser::clipready::ClipEngine e;
+        e.prepare (sr, block, 2);
+        auto p = rommuser::clipready::ClipParams {}; p.inputDb = 12.0f; p.oversampling = 2; p.hq = true;
+        e.setParams (p, true);
+        benches.push_back ({ "Clipper-R (+12 dB, 2x HQ)", [] (float* const* io, int n) { e.process (io, 2, n); } });
+    }
+    {
         static rommuser::warmdrive::DriveEngine e;
         e.prepare (sr, block, 2);
         benches.push_back ({ "Saturator-R (default)", [] (float* const* io, int n) { e.process (io, 2, n); } });
+    }
+    {
+        static rommuser::warmdrive::DriveEngine e;
+        e.prepare (sr, block, 2);
+        auto p = rommuser::warmdrive::DriveParams {}; p.hq = true;
+        e.setParams (p, true);
+        benches.push_back ({ "Saturator-R (2x HQ)", [] (float* const* io, int n) { e.process (io, 2, n); } });
     }
     {
         static rommuser::shapeeq::EqEngine e;

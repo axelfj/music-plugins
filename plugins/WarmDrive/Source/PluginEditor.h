@@ -54,7 +54,7 @@ private:
                                   rommuser::ui::Knob (rommuser::ui::tr ("CORTE 2", "SPLIT 2")),
                                   rommuser::ui::Knob (rommuser::ui::tr ("CORTE 3", "SPLIT 3")) };
     rommuser::ui::Knob input { rommuser::ui::tr ("ENTRADA", "INPUT") }, output { rommuser::ui::tr ("SALIDA", "OUTPUT") }, mix { "MIX" };
-    juce::TextButton autoGain, presetButtons[3];
+    juce::TextButton autoGain, hq, presetButtons[3];
 
     BandColumn bands[rommuser::warmdrive::maxBands];
 

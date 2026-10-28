@@ -20,6 +20,7 @@
 #pragma once
 
 #include "../../../shared/dsp/Crossover.h"
+#include "../../../shared/dsp/Adaa.h"
 #include "../../../shared/dsp/Oversampler.h"
 #include "../../../shared/dsp/Smoothing.h"
 
@@ -84,6 +85,49 @@ inline float shape (float u, Saturation type)
     }
 }
 
+// Antiderivative of shape () for HQ mode (shared/dsp/Adaa.h), in double; any constant offset is fine.
+// Rectify has no closed form, so its segment average is taken with 3-point Gauss-Legendre instead
+// (exact for polynomials up to degree 5 over the short segment between two oversampled samples).
+inline double shapeAntiderivative (double u, Saturation type)
+{
+    switch (type)
+    {
+        case Saturation::tape:
+            return dsp::logCosh (u);
+        case Saturation::tube:
+        {
+            constexpr double bias = 0.4;
+            const double tb = std::tanh (bias);
+            return (dsp::logCosh (u + bias) - tb * u) / (1.0 - tb * tb);
+        }
+        case Saturation::transistor:
+        {
+            const double a = std::fabs (u);
+            if (a >= 1.5) return a - 0.5625;      // F (1.5) + (a - 1.5), f = +-1 beyond the knee
+            return 0.5 * u * u - u * u * u * u / 27.0;
+        }
+        case Saturation::softClip:
+        {
+            constexpr double t = 0.5, w = 0.5;
+            const double a = std::fabs (u);
+            if (a <= t) return 0.5 * u * u;
+            return 0.5 * t * t + t * (a - t) + w * w * dsp::logCosh ((a - t) / w);
+        }
+        case Saturation::rectify:
+        default:
+            return 0.0; // not used (see processChunk)
+    }
+}
+
+// Average of shape over [x0, x1] by 3-point Gauss-Legendre (used for rectify in HQ mode).
+inline float shapeSegmentAverage (double x0, double x1, Saturation type)
+{
+    const double m = 0.5 * (x0 + x1), h = 0.5 * (x1 - x0);
+    constexpr double r = 0.7745966692414834; // sqrt (3 / 5)
+    return (float) ((5.0 * shape ((float) (m - r * h), type) + 8.0 * shape ((float) m, type)
+                     + 5.0 * shape ((float) (m + r * h), type)) / 18.0);
+}
+
 struct BandSettings
 {
     Saturation type = Saturation::tape;
@@ -102,6 +146,7 @@ struct DriveParams
     float outDb = 0.0f;            // -24 .. 24
     float mix = 1.0f;              // 0 .. 1
     int oversampling = 2;          // 1, 2, 4
+    bool hq = false;               // antiderivative antialiasing on top of oversampling
 };
 
 struct DriveMeters
@@ -170,6 +215,8 @@ public:
             splitters[(size_t) c].reset();
             for (auto& f : dcBlockers[(size_t) c]) f.reset();
             for (auto& f : toneFilters[(size_t) c]) f.reset();
+            for (auto& h : adaa[(size_t) c]) h = {};
+            hqComp[(size_t) c].reset();
         }
     }
 
@@ -188,6 +235,11 @@ public:
         for (int b = 0; b < maxBands; ++b)
             toneChanged = toneChanged || std::fabs (p.bands[(size_t) b].toneHz - params.bands[(size_t) b].toneHz) > 0.0f;
 
+        if (p.hq != params.hq || rateChanged)
+        {
+            for (auto& ch : adaa) for (auto& h : ch) h = {};
+            for (auto& c : hqComp) c.prepare (factors[(size_t) idx]);
+        }
         params = p;
         params.numBands = std::clamp (p.numBands, 1, maxBands);
 
@@ -242,7 +294,7 @@ public:
     int getLatencySamples() const
     {
         const auto& o = oversamplers[0u][(size_t) std::max (0, currentFactorIndex)];
-        return o ? o->getLatencySamples() : 0;
+        return (o ? o->getLatencySamples() : 0) + (params.hq ? hqComp[0].getLatencyBaseSamples() : 0);
     }
 
     DriveMeters process (float* const* io, int numChannels, int n)
@@ -285,6 +337,7 @@ private:
             }
 
             float* hi = os.upsample (pre.data(), n);
+            const bool hq = params.hq;
             for (int i = 0; i < n; ++i)
             {
                 float drive[maxBands], comp[maxBands], bmix[maxBands];
@@ -311,13 +364,41 @@ private:
                             if (over > 1.0f)
                                 meters.bandDriveDb[bi] = std::max (meters.bandDriveDb[bi], 20.0f * std::log10 (over));
                         }
-                        float y = shape (u, params.bands[bi].type) / drive[b] * comp[b];
+                        float sh;
+                        if (hq)
+                        {
+                            // The dry share of the band (bandMix and Mix) gets the same two-sample
+                            // average as the ADAA output, so mixing them never combs.
+                            const auto type = params.bands[bi].type;
+                            auto& st = adaa[ci][bi];
+                            if (type == Saturation::rectify)
+                            {
+                                sh = st.primed ? shapeSegmentAverage (st.uPrev, u, type) : shape (u, type);
+                                st.primed = true;
+                            }
+                            else
+                            {
+                                sh = st.adaa.process (u,
+                                                      [type] (double v) { return (double) shape ((float) v, type); },
+                                                      [type] (double v) { return shapeAntiderivative (v, type); });
+                            }
+                            st.uPrev = u;
+                            const float avg = 0.5f * (split[b] + st.splitPrev);
+                            st.splitPrev = split[b];
+                            split[b] = avg;
+                        }
+                        else
+                        {
+                            sh = shape (u, params.bands[bi].type);
+                        }
+                        float y = sh / drive[b] * comp[b];
                         y = dcBlockers[ci][bi].process (y);
                         y = toneFilters[ci][bi].process (y);
                         wetSum += bmix[b] * y + (1.0f - bmix[b]) * split[b];
                         drySum += split[b];
                     }
                     s = m * wetSum + (1.0f - m) * drySum;
+                    if (hq) s = hqComp[ci].process (s); // ADAA's average undone in the audio band
                 }
             }
 
@@ -347,6 +428,15 @@ private:
     std::array<std::array<std::unique_ptr<dsp::Oversampler>, 3>, maxChannels> oversamplers;
     std::array<dsp::MultibandSplitter, maxChannels> splitters;
     std::array<std::array<dsp::Biquad, maxBands>, maxChannels> dcBlockers, toneFilters;
+    struct HqState
+    {
+        dsp::Adaa1 adaa;
+        double uPrev = 0.0;      // last driven sample (rectify's segment average)
+        float splitPrev = 0.0f;  // last band sample (the dry share gets the same two-sample average)
+        bool primed = false;
+    };
+    std::array<std::array<HqState, maxBands>, maxChannels> adaa;
+    std::array<dsp::AdaaCompensator, maxChannels> hqComp;
     std::vector<float> pre;
 
     dsp::LinearSmoother inGain, outGain, mixSmooth;

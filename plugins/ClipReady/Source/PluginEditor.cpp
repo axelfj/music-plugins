@@ -197,6 +197,11 @@ ClipReadyEditor::ClipReadyEditor (ClipReadyProcessor& p)
               "Apagado: un poco más limpio, pero puede pasar el techo. DELTA no se limita.",
               "On: nothing leaving the plugin goes above the ceiling, even with Output or Mix (best on the master). "
               "Off: slightly cleaner, but it can go over the ceiling. DELTA is never limited.") },
+        { &hq, ParamIDs::hq, "HQ",
+          tr ("Antialiasing extra (ADAA): mucho menos aliasing al recortar fuerte, a cambio de un poco más de CPU. "
+              "Con HQ, 2x suena tan limpio como 4x sin HQ.",
+              "Extra antialiasing (ADAA): far less aliasing when clipping hard, for a little more CPU. "
+              "With HQ, 2x is as clean as 4x without it.") },
     };
     for (const auto& b : buttons)
     {
@@ -266,13 +271,14 @@ void ClipReadyEditor::resized()
     // Bottom: buttons.
     auto bottom = r.removeFromBottom (px (34));
     r.removeFromBottom (px (12));
-    const int bw = bottom.getWidth() / 4;
-    auto osArea = bottom.removeFromLeft (bw);
+    const int bw = bottom.getWidth() * 2 / 11;        // four buttons + a 1.5-wide quality cell
+    auto osArea = bottom.removeFromLeft (bw * 3 / 2);
     oversamplingLabel.setBounds (osArea.removeFromLeft (osArea.getWidth() / 2));
     oversampling.setBounds (osArea.reduced (px (4), px (3)));
     link.setBounds (bottom.removeFromLeft (bw).reduced (px (4), 0));
     delta.setBounds (bottom.removeFromLeft (bw).reduced (px (4), 0));
-    strict.setBounds (bottom.reduced (px (4), 0));
+    strict.setBounds (bottom.removeFromLeft (bw).reduced (px (4), 0));
+    hq.setBounds (bottom.reduced (px (4), 0));
 
     // Top row: curve + main knobs; second row: utility knobs.
     auto top = r.removeFromTop (r.getHeight() * 55 / 100);

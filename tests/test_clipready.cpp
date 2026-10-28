@@ -227,3 +227,73 @@ TEST_CASE ("Without strict ceiling the overshoot stays small", "[clipready]")
     WARN ("overshoot without strict ceiling: " << over << " dB");
     REQUIRE (over < 1.5);
 }
+
+TEST_CASE ("HQ (ADAA) lowers clipping aliases and keeps the ceiling", "[clipready][aliasing][hq]")
+{
+    struct Case { int factor; float softness; };
+    const auto c = GENERATE (Case { 1, 0.0f }, Case { 2, 0.0f }, Case { 4, 0.0f }, Case { 2, 0.5f }, Case { 4, 0.5f });
+
+    ClipParams p;
+    p.oversampling = c.factor;
+    p.softness = c.softness;
+    p.inputDb = 12.0f;
+    p.ceilingDb = 0.0f;
+    p.strictCeiling = false;
+
+    const size_t n = 1 << 15;
+    const double f0 = fs * 3715.0 / (double) n;
+    double alias[2];
+    for (int hq = 0; hq < 2; ++hq)
+    {
+        p.hq = hq == 1;
+        const auto out = run (p, sine (f0, fs, (int) n + 8192, 0.5));
+        const auto spec = powerSpectrum (out.data() + 8192, n);
+        alias[hq] = inharmonicLevelDb (spec, fs, n, f0, 20.0, 20000.0);
+    }
+    WARN ("clip " << c.factor << "x softness " << c.softness << " alias normal " << alias[0] << " / HQ " << alias[1] << " dBFS");
+    REQUIRE (alias[1] < alias[0] - 6.0);
+
+    // The ADAA output is an average of the curve, so the strict ceiling still holds.
+    p.hq = true;
+    p.strictCeiling = true;
+    p.ceilingDb = -6.0f;
+    const auto out = run (p, whiteNoise (20000, 1.0, 5));
+    REQUIRE (peak (out) <= std::pow (10.0, -6.0 / 20.0) + 1e-6);
+}
+
+TEST_CASE ("HQ below the knee: flat, and aligned with the dry path (reported latency)", "[clipready][hq]")
+{
+    const int factor = GENERATE (2, 4, 8);
+    ClipParams p;
+    p.oversampling = factor;
+    p.hq = true;
+    p.softness = 0.35f;
+    p.ceilingDb = 0.0f;
+    p.mix = 0.5f; // half dry: any misalignment between dry and wet would comb at high frequencies
+
+    ClipEngine e;
+    e.prepare (fs, 512, 1);
+    e.setParams (p, true);
+    const int lat = e.getLatencySamples();
+    for (double f : { 1000.0, 15000.0, 19000.0 })
+    {
+        e.reset();
+        auto x = sine (f, fs, 16384, 0.1);
+        const auto in = x;
+        for (size_t pos = 0; pos < x.size(); pos += 512)
+        {
+            float* ch[] = { x.data() + pos };
+            e.process (ch, 1, (int) std::min<size_t> (512, x.size() - pos));
+        }
+        double err = 0.0, sig = 0.0;
+        for (size_t i = 4096; i < x.size(); ++i)
+        {
+            const double d = (double) x[i] - in[i - (size_t) lat];
+            err += d * d;
+            sig += (double) in[i] * in[i];
+        }
+        const double nullDb = 10.0 * std::log10 (err / sig);
+        INFO ("factor " << factor << " freq " << f << " null " << nullDb << " dB");
+        REQUIRE (nullDb < -60.0);
+    }
+}

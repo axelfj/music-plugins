@@ -18,6 +18,7 @@ namespace ParamIDs
     inline constexpr auto delta = "delta";
     inline constexpr auto link = "link";
     inline constexpr auto strict = "strict";
+    inline constexpr auto hq = "hq";
 }
 
 class ClipReadyProcessor : public juce::AudioProcessor
@@ -72,6 +73,7 @@ private:
     std::atomic<float>* pDelta = nullptr;
     std::atomic<float>* pLink = nullptr;
     std::atomic<float>* pStrict = nullptr;
+    std::atomic<float>* pHq = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ClipReadyProcessor)
 };

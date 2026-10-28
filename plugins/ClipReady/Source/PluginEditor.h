@@ -72,7 +72,7 @@ private:
 
     rommuser::ui::Knob input, ceiling, softness, output, mix;
     juce::ComboBox oversampling;
-    juce::TextButton link, delta, strict;
+    juce::TextButton link, delta, strict, hq;
     juce::Label oversamplingLabel;
 
     TransferCurve curve;

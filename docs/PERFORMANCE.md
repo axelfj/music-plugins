@@ -41,3 +41,19 @@ Todos los cambios dan el mismo resultado que antes salvo el redondeo de float (l
 pasando, también con ASan/UBSan y con FMA), excepto Limiter-R, cuyo ataque se corrigió a propósito
 (ver su CHANGELOG). / Every change gives the same result up to float rounding, except Limiter-R,
 whose attack was fixed on purpose (see its CHANGELOG).
+
+## Modo HQ (ADAA) / HQ mode
+
+Clipper-R y Saturator-R tienen un botón HQ: antialiasing por antiderivada (`shared/dsp/Adaa.h`)
+sobre el sobremuestreo, con un filtro de compensación que deja la banda de audio plana y la
+latencia en muestras enteras. Aliasing de un tono de 5 kHz empujado 12 dB (Clipper) o 18 dB
+(Saturator), en dBFS, medido por los tests (`[hq]`):
+
+| Caso | Normal | HQ | CPU normal → HQ |
+| --- | ---: | ---: | --- |
+| Clipper-R, recorte duro, 2x | −38 | −54 | 1.2 % con HQ (4x normal: 1.5 %, −51 dBFS) |
+| Clipper-R, recorte duro, 4x | −51 | −74 | |
+| Clipper-R, softness 50 %, 4x | −83 | −108 | |
+| Saturator-R Tape, 2x | −68 | −85 | 1.3 % → 1.7 % |
+| Saturator-R Transistor, 2x | −60 | −76 | |
+| Saturator-R Rectify, 2x | −49 | −62 | |
