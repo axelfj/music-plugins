@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION TUNE_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(TuneReady
-    NAME "Tune Ready"
+    NAME "Tune-R"
     CODE Tnrd
     VERSION ${TUNE_READY_VERSION}
     MIDI_INPUT

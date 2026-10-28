@@ -1,4 +1,10 @@
-# Press Ready
+# Compressor-R (antes Press Ready)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Compressor-R** (antes Press Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Compressor-R** (formerly Press Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Press Ready deberían abrir con Compressor-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Press Ready should open with Compressor-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Press Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Press Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

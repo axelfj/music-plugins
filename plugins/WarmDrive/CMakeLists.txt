@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION WARM_DRIVE_VERSION LIMIT_COUNT 1)
 
 music_plugin(WarmDrive
-    NAME "Warm Drive"
+    NAME "Saturator-R"
     CODE Wmdr
     VERSION ${WARM_DRIVE_VERSION}
     CLAP_FEATURES audio-effect distortion mixing

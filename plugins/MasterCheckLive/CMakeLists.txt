@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION MASTER_CHECK_LIVE_VERSION LIMIT_COUNT 1)
 
 music_plugin(MasterCheckLive
-    NAME "Master Check Live"
+    NAME "Meter-R"
     CODE Mckl
     VERSION ${MASTER_CHECK_LIVE_VERSION}
     CLAP_FEATURES audio-effect analyzer mastering

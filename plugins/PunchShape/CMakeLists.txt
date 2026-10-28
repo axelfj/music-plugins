@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION PUNCH_SHAPE_VERSION LIMIT_COUNT 1)
 
 music_plugin(PunchShape
-    NAME "Punch Shape"
+    NAME "Transient-R"
     CODE Pnsh
     VERSION ${PUNCH_SHAPE_VERSION}
     CLAP_FEATURES audio-effect transient-shaper mixing

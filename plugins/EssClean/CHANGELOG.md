@@ -1,4 +1,10 @@
-# Ess Clean
+# De-Esser-R (antes Ess Clean)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **De-Esser-R** (antes Ess Clean). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **De-Esser-R** (formerly Ess Clean): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Ess Clean deberían abrir con De-Esser-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Ess Clean should open with De-Esser-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Ess Clean" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Ess Clean" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

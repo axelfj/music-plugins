@@ -170,7 +170,7 @@ void ResTameEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::text);
     g.setFont (juce::FontOptions (24.0f * s, juce::Font::bold));
-    g.drawText ("RES TAME", header, juce::Justification::centredLeft);
+    g.drawText (juce::String (JucePlugin_Name).toUpperCase(), header, juce::Justification::centredLeft);
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));

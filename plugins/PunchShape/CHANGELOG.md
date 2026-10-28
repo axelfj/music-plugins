@@ -1,4 +1,10 @@
-# Punch Shape
+# Transient-R (antes Punch Shape)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Transient-R** (antes Punch Shape). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Transient-R** (formerly Punch Shape): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Punch Shape deberían abrir con Transient-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Punch Shape should open with Transient-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Punch Shape" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Punch Shape" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

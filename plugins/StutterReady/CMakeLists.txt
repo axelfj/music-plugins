@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION STUTTER_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(StutterReady
-    NAME "Stutter Ready"
+    NAME "Stutter-R"
     CODE Sttr
     VERSION ${STUTTER_READY_VERSION}
     MIDI_INPUT

@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION SHAPE_EQ_VERSION LIMIT_COUNT 1)
 
 music_plugin(ShapeEQ
-    NAME "Shape EQ"
+    NAME "EQ-R"
     CODE Shpq
     VERSION ${SHAPE_EQ_VERSION}
     CLAP_FEATURES audio-effect equalizer mixing mastering

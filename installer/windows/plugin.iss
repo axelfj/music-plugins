@@ -1,9 +1,14 @@
 ; Inno Setup script shared by every plugin. CI passes the defines:
-;   /DPluginName="Clip Ready" /DPluginSlug=ClipReady /DPluginVersion=1.0.0 /DArtefacts=<path to ..._artefacts\Release>
+;   /DPluginName="Clipper-R" /DPluginSlug=ClipReady /DPluginVersion=1.0.0 /DArtefacts=<path to ..._artefacts\Release>
+;   [/DPluginFile=Clipper-R]  (download file name: the product name without spaces; defaults to PluginSlug)
+;   [/DFormerName="Clip Ready"]  (the plugin's previous product name, from plugins/<Name>/FORMER_NAMES)
 ; Installs the VST3 and CLAP into the standard shared folders, where every DAW already looks.
 
 #ifndef PluginName
   #error PluginName not defined
+#endif
+#ifndef PluginFile
+  #define PluginFile PluginSlug
 #endif
 
 [Setup]
@@ -20,7 +25,7 @@ PrivilegesRequired=admin
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 OutputDir=..\..\dist
-OutputBaseFilename={#PluginSlug}-Setup-{#PluginVersion}
+OutputBaseFilename={#PluginFile}-Setup-{#PluginVersion}
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -39,6 +44,14 @@ Name: "clap"; Description: "CLAP (Bitwig, REAPER, FL Studio 21+)"; Types: full
 Source: "{#Artefacts}\VST3\{#PluginName}.vst3\*"; DestDir: "{commoncf64}\VST3\{#PluginName}.vst3"; Components: vst3; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#Artefacts}\CLAP\{#PluginName}.clap"; DestDir: "{commoncf64}\CLAP"; Components: clap; Flags: ignoreversion
 Source: "..\..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+
+#ifdef FormerName
+[InstallDelete]
+; The plugin was renamed: remove the copy installed under the old name so the DAW does not list it twice.
+; Same plugin ID, so projects saved with the old name load the new one.
+Type: filesandordirs; Name: "{commoncf64}\VST3\{#FormerName}.vst3"
+Type: files; Name: "{commoncf64}\CLAP\{#FormerName}.clap"
+#endif
 
 [Messages]
 english.FinishedLabel=%1 is installed. Open your DAW and rescan plugins if it does not show up.%n%nFree and open source, by ROMMUSER.

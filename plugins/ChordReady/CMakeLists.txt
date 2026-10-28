@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION CHORD_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(ChordReady
-    NAME "Chord Ready"
+    NAME "Chord-R"
     CODE Chrd
     VERSION ${CHORD_READY_VERSION}
     IS_SYNTH

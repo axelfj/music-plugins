@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION ECHO_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(EchoReady
-    NAME "Echo Ready"
+    NAME "Delay-R"
     CODE Ecrd
     VERSION ${ECHO_READY_VERSION}
     CLAP_FEATURES audio-effect delay

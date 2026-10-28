@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION PHASE_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(PhaseReady
-    NAME "Phase Ready"
+    NAME "Phaser-R"
     CODE Phrd
     VERSION ${PHASE_READY_VERSION}
     CLAP_FEATURES audio-effect phaser modulation
