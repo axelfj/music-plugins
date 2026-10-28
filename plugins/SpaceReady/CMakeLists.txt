@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION SPACE_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(SpaceReady
-    NAME "Space Ready"
+    NAME "Reverb-R"
     CODE Sprd
     VERSION ${SPACE_READY_VERSION}
     CLAP_FEATURES audio-effect reverb

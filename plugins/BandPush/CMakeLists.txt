@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION BAND_PUSH_VERSION LIMIT_COUNT 1)
 
 music_plugin(BandPush
-    NAME "Band Push"
+    NAME "Multiband-R"
     CODE Bdph
     VERSION ${BAND_PUSH_VERSION}
     CLAP_FEATURES audio-effect compressor multi-effects mixing

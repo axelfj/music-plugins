@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION LOW_MONO_VERSION LIMIT_COUNT 1)
 
 music_plugin(LowMono
-    NAME "Low Mono"
+    NAME "Stereo-R"
     CODE Lwmn
     VERSION ${LOW_MONO_VERSION}
     CLAP_FEATURES audio-effect utility mastering

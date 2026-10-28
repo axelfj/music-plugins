@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION ESS_CLEAN_VERSION LIMIT_COUNT 1)
 
 music_plugin(EssClean
-    NAME "Ess Clean"
+    NAME "De-Esser-R"
     CODE Escl
     VERSION ${ESS_CLEAN_VERSION}
     CLAP_FEATURES audio-effect de-esser mixing

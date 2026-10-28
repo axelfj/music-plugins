@@ -152,7 +152,12 @@ jobs:
             # The .vst3 is a folder, so BaseName would keep the extension.
             $product = (Get-ChildItem "$($art.FullName)/${{ env.BUILD_TYPE }}/VST3" -Filter "*.vst3" | Select-Object -First 1).Name -replace '\.vst3$', ''
             "Packaging $product $version"
-            & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DPluginName=$product" "/DPluginSlug=$name" "/DPluginVersion=$version" "/DArtefacts=$($art.FullName)\${{ env.BUILD_TYPE }}" installer\windows\plugin.iss
+            $iscc = @("/DPluginName=$product", "/DPluginFile=$($product -replace ' ', '')", "/DPluginSlug=$name", "/DPluginVersion=$version", "/DArtefacts=$($art.FullName)\${{ env.BUILD_TYPE }}")
+            if (Test-Path "plugins/$name/FORMER_NAMES") {
+              $former = (Get-Content "plugins/$name/FORMER_NAMES" -First 1).Trim()
+              if ($former) { $iscc += "/DFormerName=$former" }
+            }
+            & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" @iscc installer\windows\plugin.iss
             if ($LASTEXITCODE -ne 0) { exit 1 }
           }
           Get-ChildItem dist
@@ -168,7 +173,8 @@ jobs:
           for dir in plugins/*/; do
             name=$(basename "$dir"); version=$(head -n1 "$dir/VERSION")
             art=$(ls -d build/plugins/$name/*_artefacts | head -n1)/${{ env.BUILD_TYPE }}
-            tar -C "$art" -czf "dist/$name-$version-linux-x86_64.tar.gz" VST3 CLAP
+            product=$(basename "$art"/VST3/*.vst3 .vst3)
+            tar -C "$art" -czf "dist/${product// /}-$version-linux-x86_64.tar.gz" VST3 CLAP
           done
           ls -l dist
 
@@ -202,28 +208,31 @@ jobs:
           slug=$(echo "$plugin" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')
           echo "tag=$slug-v$version" >> "$GITHUB_OUTPUT"
           echo "prerelease=$([[ "$version" == *-* ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
-          # "ShapeEQ" -> "Shape EQ" for the release title.
-          echo "title=$(echo "$plugin" | sed -E 's/([a-z0-9])([A-Z])/\1 \2/g') $version" >> "$GITHUB_OUTPUT"
+          # Release title = the product name the DAW shows (NAME in the plugin's CMakeLists.txt), e.g. "EQ-R".
+          product=$(sed -nE 's/^ *NAME "([^"]+)".*/\1/p' "plugins/$plugin/CMakeLists.txt" | head -n1)
+          echo "title=$product $version" >> "$GITHUB_OUTPUT"
+          # Download files are named after the product without spaces, e.g. "PitchDelay-R-Setup-1.0.0-alpha.2.exe".
+          file="${product// /}"
           mkdir -p release
-          find artifacts -type f -name "$plugin*" -exec cp {} release/ \;
+          find artifacts -type f -name "$file-*" -exec cp {} release/ \;
           ls -l release
           # Every file announced in the notes must exist among the assets.
-          for f in "$plugin-Setup-$version.exe" "$plugin-$version.pkg" "$plugin-$version-linux-x86_64.tar.gz"; do
+          for f in "$file-Setup-$version.exe" "$file-$version.pkg" "$file-$version-linux-x86_64.tar.gz"; do
             [ -f "release/$f" ] || { echo "::error::missing asset $f"; exit 1; }
           done
-          (cd release && sha256sum "$plugin-Setup-$version.exe" "$plugin-$version.pkg" "$plugin-$version-linux-x86_64.tar.gz" > SHA256SUMS)
-          python3 - "$plugin" "$version" <<'EOF'
+          (cd release && sha256sum "$file-Setup-$version.exe" "$file-$version.pkg" "$file-$version-linux-x86_64.tar.gz" > SHA256SUMS)
+          python3 - "$plugin" "$version" "$file" <<'EOF'
           import re, sys
-          plugin, version = sys.argv[1:]
+          plugin, version, file = sys.argv[1:]
           text = open(f"plugins/{plugin}/CHANGELOG.md", encoding="utf-8").read()
           m = re.search(r"^## \[?%s\]?.*?$(.*?)(?=^## |\Z)" % re.escape(version), text, re.M | re.S)
           if not m or not m.group(1).strip():
               raise SystemExit("Release requires nonempty version-specific changelog notes")
           notes = m.group(1).strip() + (
               "\n\n### Descarga / Download\n\n"
-              f"- Windows: `{plugin}-Setup-{version}.exe` (VST3 + CLAP)\n"
-              f"- macOS: `{plugin}-{version}.pkg` (VST3 + AU + CLAP, Intel y Apple silicon)\n"
-              f"- Linux: `{plugin}-{version}-linux-x86_64.tar.gz`\n\n"
+              f"- Windows: `{file}-Setup-{version}.exe` (VST3 + CLAP)\n"
+              f"- macOS: `{file}-{version}.pkg` (VST3 + AU + CLAP, Intel y Apple silicon)\n"
+              f"- Linux: `{file}-{version}-linux-x86_64.tar.gz`\n\n"
               "Los instaladores todavia no estan firmados. En macOS, el README explica como abrirlos la primera vez. / "
               "The installers are not code-signed yet; see the README for the first-launch steps on macOS.\n")
           open("notes.md", "w", encoding="utf-8").write(notes)

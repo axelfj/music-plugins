@@ -24,5 +24,15 @@ class ValidatorGateTest(unittest.TestCase):
     def test_reported_failure(self): self.check('SUCCESS\n!!! Test failed', 0, False)
     def test_failed_process(self): self.check('FAILURE', 1, False)
 
+    def test_crash_then_success_is_retried(self):
+        with tempfile.TemporaryDirectory() as folder:
+            folder = pathlib.Path(folder)
+            marker = folder / 'crashed'
+            validator = folder / 'flaky pluginval'
+            validator.write_text('#!/usr/bin/env bash\nif [ ! -e "' + str(marker) + '" ]; then touch "' + str(marker) + '"; echo SUCCESS; exit 139; fi\necho SUCCESS\n')
+            validator.chmod(0o755)
+            result = subprocess.run(['bash', str(SCRIPT), str(validator), 'p.vst3', str(folder / 'p.log')], capture_output=True)
+            self.assertEqual(result.returncode, 0)
+
 if __name__ == '__main__':
     unittest.main()

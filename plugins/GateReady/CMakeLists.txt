@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION GATE_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(GateReady
-    NAME "Gate Ready"
+    NAME "Gate-R"
     CODE Gtrd
     VERSION ${GATE_READY_VERSION}
     CLAP_FEATURES audio-effect expander mixing

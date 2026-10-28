@@ -1,4 +1,10 @@
-# Band Push
+# Multiband-R (antes Band Push)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Multiband-R** (antes Band Push). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Multiband-R** (formerly Band Push): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Band Push deberían abrir con Multiband-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Band Push should open with Multiband-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
+- El instalador de Windows y macOS borra la copia vieja llamada "Band Push" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Band Push" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
 
 ## 1.0.0-alpha.1
 

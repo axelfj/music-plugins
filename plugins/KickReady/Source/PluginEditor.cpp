@@ -257,7 +257,7 @@ void KickReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::text);
     g.setFont (juce::FontOptions (24.0f * s, juce::Font::bold));
-    g.drawText ("KICK READY", header, juce::Justification::centredLeft);
+    g.drawText (juce::String (JucePlugin_Name).toUpperCase(), header, juce::Justification::centredLeft);
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));
@@ -399,7 +399,7 @@ void KickReadyEditor::exportWav()
                               if (file == juce::File()) return;
                               if (! file.hasFileExtension ("wav")) file = file.withFileExtension ("wav");
                               if (! processor.exportWav (file))
-                                  juce::AlertWindow::showMessageBoxAsync (juce::MessageBoxIconType::WarningIcon, "Kick Ready",
+                                  juce::AlertWindow::showMessageBoxAsync (juce::MessageBoxIconType::WarningIcon, JucePlugin_Name,
                                                                           tr ("No se pudo guardar el archivo.", "Could not save the file."));
                           });
 }

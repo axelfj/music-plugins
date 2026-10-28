@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION KICK_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(KickReady
-    NAME "Kick Ready"
+    NAME "Kick-R"
     CODE Kkrd
     VERSION ${KICK_READY_VERSION}
     IS_SYNTH

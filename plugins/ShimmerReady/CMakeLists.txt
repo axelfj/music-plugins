@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION SHIMMER_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(ShimmerReady
-    NAME "Shimmer Ready"
+    NAME "Pitch Delay-R"
     CODE Shmr
     VERSION ${SHIMMER_READY_VERSION}
     CLAP_FEATURES audio-effect delay pitch-shifter reverb

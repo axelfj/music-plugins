@@ -78,4 +78,17 @@ function(music_plugin target)
             juce::juce_recommended_config_flags
             juce::juce_recommended_lto_flags
             juce::juce_recommended_warning_flags)
+
+    # README gallery: a small app that renders this plugin's editor to a PNG (tools/screenshot).
+    # It reuses the plugin's shared code, the same way JUCE's format wrappers do.
+    if(MUSIC_PLUGINS_BUILD_SCREENSHOTS)
+        add_executable(${target}_Screenshot ${PROJECT_SOURCE_DIR}/tools/screenshot/Screenshot.cpp)
+        target_compile_definitions(${target}_Screenshot PRIVATE
+            $<TARGET_PROPERTY:${target},COMPILE_DEFINITIONS>)
+        target_include_directories(${target}_Screenshot PRIVATE
+            $<TARGET_PROPERTY:${target},INCLUDE_DIRECTORIES>)
+        target_compile_options(${target}_Screenshot PRIVATE
+            $<TARGET_PROPERTY:${target},COMPILE_OPTIONS>)
+        target_link_libraries(${target}_Screenshot PRIVATE ${target})
+    endif()
 endfunction()

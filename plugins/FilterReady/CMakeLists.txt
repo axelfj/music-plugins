@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION FILTER_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(FilterReady
-    NAME "Filter Ready"
+    NAME "Filter-R"
     CODE Fltr
     VERSION ${FILTER_READY_VERSION}
     CLAP_FEATURES audio-effect filter modulation

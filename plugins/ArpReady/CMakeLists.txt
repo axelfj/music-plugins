@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION ARP_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(ArpReady
-    NAME "Arp Ready"
+    NAME "Arpeggiator-R"
     CODE Arpr
     VERSION ${ARP_READY_VERSION}
     IS_SYNTH

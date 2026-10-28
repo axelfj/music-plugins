@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION RES_TAME_VERSION LIMIT_COUNT 1)
 
 music_plugin(ResTame
-    NAME "Res Tame"
+    NAME "Resonance-R"
     CODE Rstm
     VERSION ${RES_TAME_VERSION}
     CLAP_FEATURES audio-effect equalizer mixing

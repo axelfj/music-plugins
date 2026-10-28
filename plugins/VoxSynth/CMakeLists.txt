@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION VOX_SYNTH_VERSION LIMIT_COUNT 1)
 
 music_plugin(VoxSynth
-    NAME "Vox Synth"
+    NAME "Vocoder-R"
     CODE Vxsy
     VERSION ${VOX_SYNTH_VERSION}
     MIDI_INPUT

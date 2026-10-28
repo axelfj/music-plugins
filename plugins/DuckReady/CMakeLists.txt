@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION DUCK_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(DuckReady
-    NAME "Duck Ready"
+    NAME "Sidechain-R"
     CODE Dkrd
     VERSION ${DUCK_READY_VERSION}
     MIDI_INPUT

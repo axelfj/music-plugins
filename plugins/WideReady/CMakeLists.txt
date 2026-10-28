@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION WIDE_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(WideReady
-    NAME "Wide Ready"
+    NAME "Chorus-R"
     CODE Wdrd
     VERSION ${WIDE_READY_VERSION}
     CLAP_FEATURES audio-effect chorus flanger modulation
