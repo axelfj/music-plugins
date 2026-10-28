@@ -124,7 +124,7 @@ ShimmerReadyEditor::ShimmerReadyEditor (ShimmerReadyProcessor& p)
         { &feedback, ParamIDs::feedback, tr ("Cuánto vuelve al bucle. Más de 100 % crece hasta el limitador suave.", "How much goes back round the loop. Above 100% it grows up to the soft limiter.") },
         { &lowCut, ParamIDs::lowCut, tr ("Quita graves en cada vuelta del bucle.", "Removes lows on every pass round the loop.") },
         { &highCut, ParamIDs::highCut, tr ("Quita agudos en cada vuelta: los ecos se oscurecen.", "Removes highs on every pass: the echoes get darker.") },
-        { &shimmer, ParamIDs::shimmer, tr ("Reverb añadida a los ecos (motor de Space Ready).", "Reverb added to the echoes (Space Ready engine).") },
+        { &shimmer, ParamIDs::shimmer, tr ("Reverb añadida a los ecos (motor de Reverb-R).", "Reverb added to the echoes (Reverb-R engine).") },
         { &decay, ParamIDs::decay, tr ("Duración de la cola de la reverb.", "Length of the reverb tail.") },
         { &width, ParamIDs::width, tr ("Desplaza el eco derecho hasta un 15 % para abrir el estéreo.", "Offsets the right echo by up to 15% to widen the stereo.") },
         { &mix, ParamIDs::mix, tr ("Mezcla con la señal original.", "Blend with the original signal.") },
@@ -199,7 +199,7 @@ void ShimmerReadyEditor::paint (juce::Graphics& g)
 
     g.setColour (colours::text);
     g.setFont (juce::FontOptions (24.0f * s, juce::Font::bold));
-    g.drawText ("SHIMMER READY", header, juce::Justification::centredLeft);
+    g.drawText (juce::String (JucePlugin_Name).toUpperCase(), header, juce::Justification::centredLeft);
 
     g.setColour (colours::textDim);
     g.setFont (juce::FontOptions (12.0f * s));

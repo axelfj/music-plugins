@@ -3,7 +3,7 @@
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/VERSION PEAK_READY_VERSION LIMIT_COUNT 1)
 
 music_plugin(PeakReady
-    NAME "Peak Ready"
+    NAME "Limiter-R"
     CODE Pkrd
     VERSION ${PEAK_READY_VERSION}
     CLAP_FEATURES audio-effect limiter mastering

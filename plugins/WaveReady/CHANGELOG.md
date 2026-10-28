@@ -1,4 +1,10 @@
-# Wave Ready
+# Synth-R (antes Wave Ready)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Synth-R** (antes Wave Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Synth-R** (formerly Wave Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Wave Ready abren igual con Synth-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Wave Ready open with Synth-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Wave Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Wave Ready" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 

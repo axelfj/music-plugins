@@ -1,4 +1,10 @@
-# Low Mono
+# Stereo-R (antes Low Mono)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Stereo-R** (antes Low Mono). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Stereo-R** (formerly Low Mono): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Low Mono abren igual con Stereo-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Low Mono open with Stereo-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Low Mono" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Low Mono" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 

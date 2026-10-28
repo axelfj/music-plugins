@@ -1,4 +1,10 @@
-# Space Ready
+# Reverb-R (antes Space Ready)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Reverb-R** (antes Space Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Reverb-R** (formerly Space Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Space Ready abren igual con Reverb-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Space Ready open with Reverb-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Space Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Space Ready" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 

@@ -1,4 +1,10 @@
-# Phase Ready
+# Phaser-R (antes Phase Ready)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Phaser-R** (antes Phase Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Phaser-R** (formerly Phase Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Phase Ready abren igual con Phaser-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Phase Ready open with Phaser-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Phase Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Phase Ready" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 

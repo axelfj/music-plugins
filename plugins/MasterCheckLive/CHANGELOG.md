@@ -1,4 +1,10 @@
-# Master Check Live
+# Meter-R (antes Master Check Live)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Meter-R** (antes Master Check Live). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Meter-R** (formerly Master Check Live): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Master Check Live abren igual con Meter-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Master Check Live open with Meter-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Master Check Live" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Master Check Live" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 

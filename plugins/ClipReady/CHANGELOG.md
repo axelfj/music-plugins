@@ -1,4 +1,10 @@
-# Clip Ready
+# Clipper-R (antes Clip Ready)
+
+## 1.0.0-alpha.3
+
+- Nuevo nombre: **Clipper-R** (antes Clip Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Clipper-R** (formerly Clip Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Clip Ready abren igual con Clipper-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Clip Ready open with Clipper-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Clip Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Clip Ready" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.2
 

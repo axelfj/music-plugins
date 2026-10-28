@@ -1,4 +1,10 @@
-# Shimmer Ready
+# Pitch Delay-R (antes Shimmer Ready)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Pitch Delay-R** (antes Shimmer Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Pitch Delay-R** (formerly Shimmer Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Shimmer Ready abren igual con Pitch Delay-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Shimmer Ready open with Pitch Delay-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Shimmer Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Shimmer Ready" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 

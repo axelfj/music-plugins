@@ -1,4 +1,10 @@
-# Tune Ready
+# Tune-R (antes Tune Ready)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Tune-R** (antes Tune Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Tune-R** (formerly Tune Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Tune Ready abren igual con Tune-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Tune Ready open with Tune-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Tune Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Tune Ready" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 

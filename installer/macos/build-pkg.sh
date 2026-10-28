@@ -24,11 +24,27 @@ for dir in plugins/*/; do
         codesign --force --deep --sign - "$b"
     done
 
+    # Renamed plugin: a preinstall script removes the bundles installed under the old name, so the
+    # DAW does not list the plugin twice (same plugin ID, so saved projects load the new one).
+    scripts=$(mktemp -d)
+    if [ -s "$dir/FORMER_NAMES" ]; then
+        former=$(head -n1 "$dir/FORMER_NAMES" | sed 's/[[:space:]]*$//')
+        cat > "$scripts/preinstall" <<SCRIPT
+#!/bin/sh
+rm -rf "/Library/Audio/Plug-Ins/VST3/$former.vst3" \\
+       "/Library/Audio/Plug-Ins/Components/$former.component" \\
+       "/Library/Audio/Plug-Ins/CLAP/$former.clap"
+exit 0
+SCRIPT
+        chmod +x "$scripts/preinstall"
+    fi
+
     pkgbuild --root "$root" \
+             --scripts "$scripts" \
              --identifier "com.rommuser.$slug" \
              --version "$numeric" \
              --install-location / \
-             "$out/$slug-$version.pkg"
-    rm -rf "$root"
+             "$out/${product// /}-$version.pkg"
+    rm -rf "$root" "$scripts"
 done
 ls -l "$out"

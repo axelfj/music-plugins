@@ -1,4 +1,10 @@
-# Kick Ready
+# Kick-R (antes Kick Ready)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Kick-R** (antes Kick Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Kick-R** (formerly Kick Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Kick Ready abren igual con Kick-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Kick Ready open with Kick-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Kick Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Kick Ready" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 

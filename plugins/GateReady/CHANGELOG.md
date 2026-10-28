@@ -1,4 +1,10 @@
-# Gate Ready
+# Gate-R (antes Gate Ready)
+
+## 1.0.0-alpha.2
+
+- Nuevo nombre: **Gate-R** (antes Gate Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Gate-R** (formerly Gate Ready): the name now says what the plugin does; the R stands for ROMMUSER.
+- Los proyectos guardados con Gate Ready abren igual con Gate-R y conservan sus ajustes (mismo ID de plugin). / Projects saved with Gate Ready open with Gate-R and keep their settings (same plugin ID).
+- El instalador borra la copia vieja llamada "Gate Ready" para que el DAW no muestre el plugin dos veces. / The installer removes the old "Gate Ready" copy so the DAW does not list the plugin twice.
 
 ## 1.0.0-alpha.1
 
