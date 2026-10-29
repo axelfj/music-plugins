@@ -6,12 +6,15 @@
 - Temas: 7 incluidos (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) y editor para crear los tuyos, solo para este plugin o para todos. El plugin recuerda su tamaño y su tema. / Themes: 7 built in plus an editor to make your own, for this plugin only or for all. The plugin remembers its size and theme.
 - Esquina superior derecha: "R - V1 - FREE". / Top-right corner: "R - V1 - FREE".
 
+## 1.0.0-alpha.3
+
+- Menos CPU: las líneas de delay usan índices sin división (1.0 % → 0.8 % de un núcleo). / Less CPU: delay lines index without divisions.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Chorus-R** (antes Wide Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Chorus-R** (formerly Wide Ready): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Wide Ready deberían abrir con Chorus-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Wide Ready should open with Chorus-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Wide Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Wide Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
-- Menos CPU: las líneas de delay usan índices sin división (1.0 % → 0.8 % de un núcleo). / Less CPU: delay lines index without divisions.
 
 ## 1.0.0-alpha.1
 

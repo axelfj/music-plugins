@@ -6,12 +6,15 @@
 - Temas: 7 incluidos (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) y editor para crear los tuyos, solo para este plugin o para todos. El plugin recuerda su tamaño y su tema. / Themes: 7 built in plus an editor to make your own, for this plugin only or for all. The plugin remembers its size and theme.
 - Esquina superior derecha: "R - V1 - FREE". / Top-right corner: "R - V1 - FREE".
 
+## 1.0.0-alpha.3
+
+- Menos CPU: sobremuestreo ~2x más rápido con el mismo filtro (2.6 % → 1.1 % de un núcleo). / Less CPU: ~2x faster oversampling with the same filter.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Filter-R** (antes Filter Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Filter-R** (formerly Filter Ready): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Filter Ready deberían abrir con Filter-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Filter Ready should open with Filter-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Filter Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Filter Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
-- Menos CPU: sobremuestreo ~2x más rápido con el mismo filtro (2.6 % → 1.1 % de un núcleo). / Less CPU: ~2x faster oversampling with the same filter.
 
 ## 1.0.0-alpha.1
 
