@@ -30,6 +30,7 @@ WarmDriveProcessor::WarmDriveProcessor()
     pXover[1] = state.getRawParameterValue (ParamIDs::xover2);
     pXover[2] = state.getRawParameterValue (ParamIDs::xover3);
     pAutoGain = state.getRawParameterValue (ParamIDs::autoGain);
+    pHq = state.getRawParameterValue (ParamIDs::hq);
     pInput = state.getRawParameterValue (ParamIDs::input);
     pOutput = state.getRawParameterValue (ParamIDs::output);
     pMix = state.getRawParameterValue (ParamIDs::mix);
@@ -58,6 +59,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout WarmDriveProcessor::createLa
     layout.add (std::make_unique<P> (ParameterID { ParamIDs::xover3, 1 }, "Crossover 3",
                                      logRange (1000.0f, 16000.0f), 4000.0f, A().withLabel ("Hz").withStringFromValueFunction (hzString)));
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { ParamIDs::autoGain, 1 }, "Auto Gain", true));
+    layout.add (std::make_unique<AudioParameterBool> (ParameterID { ParamIDs::hq, 1 }, "HQ", false));
     layout.add (std::make_unique<P> (ParameterID { ParamIDs::input, 1 }, "Input",
                                      NormalisableRange<float> (-24.0f, 24.0f, 0.1f), 0.0f, A().withLabel ("dB").withStringFromValueFunction (dbString)));
     layout.add (std::make_unique<P> (ParameterID { ParamIDs::output, 1 }, "Output",
@@ -87,6 +89,7 @@ DriveParams WarmDriveProcessor::readParams() const
     for (int i = 0; i < 3; ++i)
         p.crossoverHz[i] = pXover[i]->load();
     p.autoGain = pAutoGain->load() > 0.5f;
+    p.hq = pHq->load() > 0.5f;
     p.inDb = pInput->load();
     p.outDb = pOutput->load();
     p.mix = pMix->load() / 100.0f;

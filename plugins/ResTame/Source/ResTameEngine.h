@@ -73,6 +73,9 @@ public:
             c.scInput.assign ((size_t) fftSize, 0.0f);
             c.scSpectrum.assign ((size_t) fftSize, {});
         }
+        frameA.assign ((size_t) fftSize, 0.0f);
+        frameB.assign ((size_t) fftSize, 0.0f);
+        work.assign ((size_t) fftSize, {});
         detectorPower.assign ((size_t) bins, 0.0f);
         gainDb.assign ((size_t) bins, 0.0f);
         envelopeDb.assign ((size_t) bins, 0.0f);
@@ -140,8 +143,8 @@ public:
                 c.output[outIdx] = 0.0f;
                 io[ch][i] = params.delta ? dry - wet : wet;
             }
-            writePos = (writePos + 1) % fftSize;
-            outReadPos = (outReadPos + 1) % (fftSize * 2);
+            if (++writePos == fftSize) writePos = 0;
+            if (++outReadPos == fftSize * 2) outReadPos = 0;
             if (++hopCounter >= hop)
             {
                 hopCounter = 0;
@@ -158,12 +161,30 @@ private:
         std::vector<std::complex<float>> spectrum, scSpectrum;
     };
 
-    void analyse (const std::vector<float>& ring, std::vector<std::complex<float>>& spec) const
+    // Windowed frame, oldest sample first: the ring's write position is the oldest after the increment.
+    void windowFrame (const std::vector<float>& ring, std::vector<float>& frame) const
     {
-        // Oldest sample first: the ring's write position is the oldest after the increment.
-        for (int i = 0; i < fftSize; ++i)
-            spec[(size_t) i] = { ring[(size_t) ((writePos + i) % fftSize)] * window[(size_t) i], 0.0f };
+        const int first = fftSize - writePos; // samples from writePos to the end of the ring
+        for (int i = 0; i < first; ++i)
+            frame[(size_t) i] = ring[(size_t) (writePos + i)] * window[(size_t) i];
+        for (int i = first; i < fftSize; ++i)
+            frame[(size_t) i] = ring[(size_t) (i - first)] * window[(size_t) i];
+    }
+
+    void analyse (const std::vector<float>& ring, std::vector<std::complex<float>>& spec)
+    {
+        windowFrame (ring, frameA);
+        for (int i = 0; i < fftSize; ++i) spec[(size_t) i] = { frameA[(size_t) i], 0.0f };
         fft.forward (spec.data());
+    }
+
+    // Both channels with one complex FFT (they are real signals).
+    void analysePair (const std::vector<float>& ringL, const std::vector<float>& ringR,
+                      std::vector<std::complex<float>>& specL, std::vector<std::complex<float>>& specR)
+    {
+        windowFrame (ringL, frameA);
+        windowFrame (ringR, frameB);
+        fft.forwardTwoReal (frameA.data(), frameB.data(), work.data(), specL.data(), specR.data());
     }
 
     void processFrame (int nch)
@@ -172,12 +193,12 @@ private:
         auto& R = chans[(size_t) std::min (1, nch - 1)];
         const bool stereo = nch > 1;
 
-        analyse (L.input, L.spectrum);
-        if (stereo) analyse (R.input, R.spectrum);
+        if (stereo) analysePair (L.input, R.input, L.spectrum, R.spectrum);
+        else analyse (L.input, L.spectrum);
         if (params.externalSidechain)
         {
-            analyse (L.scInput, L.scSpectrum);
-            if (stereo) analyse (R.scInput, R.scSpectrum);
+            if (stereo) analysePair (L.scInput, R.scInput, L.scSpectrum, R.scSpectrum);
+            else analyse (L.scInput, L.scSpectrum);
         }
 
         // Mid/Side placement works on transformed spectra (linear, so it commutes with the FFT).
@@ -256,7 +277,7 @@ private:
         {
             for (int k = 0; k < bins; ++k)
             {
-                const float g = std::pow (10.0f, -gainDb[(size_t) k] / 20.0f);
+                const float g = std::exp2 (-0.16609640474f * gainDb[(size_t) k]); // 10^(-dB / 20)
                 spec[(size_t) k] *= g;
                 if (k > 0 && k < fftSize / 2) spec[(size_t) (fftSize - k)] *= g;
             }
@@ -276,12 +297,31 @@ private:
 
         // Back to time, synthesis window, overlap-add. The frame's first sample is the one that was
         // written fftSize samples ago, i.e. the output sample read next.
-        for (int ch = 0; ch < nch; ++ch)
+        // Both spectra are still Hermitian (real gains, applied symmetrically), so one inverse
+        // FFT returns the left channel in the real part and the right one in the imaginary part.
+        if (stereo)
         {
-            auto& c = chans[(size_t) ch];
-            fft.inverse (c.spectrum.data());
-            for (int i = 0; i < fftSize; ++i)
-                c.output[(size_t) ((outReadPos + i) % (fftSize * 2))] += c.spectrum[(size_t) i].real() * window[(size_t) i];
+            fft.inverseTwoReal (L.spectrum.data(), R.spectrum.data(), work.data());
+            for (int i = 0; i < fftSize; ++i) { frameA[(size_t) i] = work[(size_t) i].real(); frameB[(size_t) i] = work[(size_t) i].imag(); }
+            overlapAdd (L.output, frameA);
+            overlapAdd (R.output, frameB);
+        }
+        else
+        {
+            fft.inverse (L.spectrum.data());
+            for (int i = 0; i < fftSize; ++i) frameA[(size_t) i] = L.spectrum[(size_t) i].real();
+            overlapAdd (L.output, frameA);
+        }
+    }
+
+    void overlapAdd (std::vector<float>& output, const std::vector<float>& frame) const
+    {
+        const int ring = fftSize * 2;
+        for (int i = 0; i < fftSize; ++i)
+        {
+            int idx = outReadPos + i;
+            if (idx >= ring) idx -= ring;
+            output[(size_t) idx] += frame[(size_t) i] * window[(size_t) i];
         }
     }
 
@@ -301,7 +341,8 @@ private:
     int channels = 2, fftOrder = order, fftSize = 1 << order, hop = (1 << order) / 4, bins = (1 << order) / 2 + 1;
     TameParams params;
     dsp::FFT fft;
-    std::vector<float> window;
+    std::vector<float> window, frameA, frameB;
+    std::vector<std::complex<float>> work;
     std::array<Channel, (size_t) maxChannels> chans;
     std::vector<float> detectorPower, gainDb, envelopeDb, magDb, targetDb;
     std::vector<double> prefix;

@@ -109,12 +109,18 @@ public:
         length = (int) h.size();
         centre = (length - 1) / 2;
 
-        // Even-index taps form the only non-trivial polyphase branch.
+        // Even-index taps form the only non-trivial polyphase branch. The branch is symmetric
+        // (tap k equals tap T - 1 - k, T even), so only the first half is stored and each
+        // coefficient multiplies the sum of the two samples that share it: half the multiplies.
+        std::vector<float> evenTaps;
         for (int i = 0; i < length; i += 2)
             evenTaps.push_back ((float) h[(size_t) i]);
+        numEven = evenTaps.size();
+        assert (numEven % 2 == 0);
+        halfTaps.assign (evenTaps.begin(), evenTaps.begin() + (std::ptrdiff_t) (numEven / 2));
 
-        upHistory.resize (evenTaps.size());
-        downEvenHistory.resize (evenTaps.size());
+        upHistory.resize (numEven);
+        downEvenHistory.resize (numEven);
         downOddHistory.resize ((size_t) (centre + 1) / 2 + 1);
     }
 
@@ -133,17 +139,13 @@ public:
     // in: n samples at the low rate. out: 2n samples at the high rate.
     void upsample (const float* in, float* out, int n)
     {
-        const auto taps = evenTaps.size();
         const auto oddOffset = (size_t) (centre - 1) / 2;
 
         for (int i = 0; i < n; ++i)
         {
             upHistory.push (in[i]);
             const float* w = upHistory.window();
-
-            float acc = 0.0f;
-            for (size_t k = 0; k < taps; ++k)
-                acc += evenTaps[k] * w[k];
+            const float acc = symmetricDot (w);
 
             // Zero-stuffing halves the energy, hence the factor 2 (centre tap 0.5 * 2 = 1).
             out[2 * i] = 2.0f * acc;
@@ -154,7 +156,6 @@ public:
     // in: 2n samples at the high rate. out: n samples at the low rate.
     void downsample (const float* in, float* out, int n)
     {
-        const auto taps = evenTaps.size();
         const auto oddOffset = (size_t) (centre + 1) / 2;
 
         for (int i = 0; i < n; ++i)
@@ -163,10 +164,7 @@ public:
             downOddHistory.push (in[2 * i + 1]);
             downEvenHistory.push (in[2 * i]);
 
-            const float* e = downEvenHistory.window();
-            float acc = 0.0f;
-            for (size_t k = 0; k < taps; ++k)
-                acc += evenTaps[k] * e[k];
+            const float acc = symmetricDot (downEvenHistory.window());
 
             // y[2m - centre] with centre odd lives in the odd-sample history:
             // odd sample index 2m - centre = 2(m - (centre + 1) / 2) + 1, pushed (centre + 1) / 2 calls ago.
@@ -175,8 +173,30 @@ public:
     }
 
 private:
+    // sum_k evenTap[k] * w[k] over the full symmetric branch. Four independent partial sums let
+    // the compiler keep several multiply-adds in flight (and vectorise) without -ffast-math.
+    inline float symmetricDot (const float* w) const
+    {
+        const size_t half = halfTaps.size();
+        const float* c = halfTaps.data();
+        const float* tail = w + numEven - 1;
+        float a0 = 0.0f, a1 = 0.0f, a2 = 0.0f, a3 = 0.0f;
+        size_t k = 0;
+        for (; k + 4 <= half; k += 4)
+        {
+            a0 += c[k] * (w[k] + tail[-(std::ptrdiff_t) k]);
+            a1 += c[k + 1] * (w[k + 1] + tail[-(std::ptrdiff_t) (k + 1)]);
+            a2 += c[k + 2] * (w[k + 2] + tail[-(std::ptrdiff_t) (k + 2)]);
+            a3 += c[k + 3] * (w[k + 3] + tail[-(std::ptrdiff_t) (k + 3)]);
+        }
+        for (; k < half; ++k)
+            a0 += c[k] * (w[k] + tail[-(std::ptrdiff_t) k]);
+        return (a0 + a1) + (a2 + a3);
+    }
+
     int length = 0, centre = 0;
-    std::vector<float> evenTaps;
+    size_t numEven = 0;
+    std::vector<float> halfTaps;
     detail::History upHistory, downEvenHistory, downOddHistory;
 };
 
@@ -207,9 +227,9 @@ public:
     {
         if (delay == 0)
             return x;
-        const size_t size = (size_t) delay + 1;
         buf[pos] = x;
-        pos = (pos + 1) % size;
+        if (++pos > (size_t) delay) // wrap without a division (size is delay + 1)
+            pos = 0;
         return buf[pos];
     }
 

@@ -26,6 +26,7 @@ ClipReadyProcessor::ClipReadyProcessor()
     pDelta = state.getRawParameterValue (ParamIDs::delta);
     pLink = state.getRawParameterValue (ParamIDs::link);
     pStrict = state.getRawParameterValue (ParamIDs::strict);
+    pHq = state.getRawParameterValue (ParamIDs::hq);
 }
 
 juce::AudioProcessorValueTreeState::ParameterLayout ClipReadyProcessor::createLayout()
@@ -55,6 +56,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout ClipReadyProcessor::createLa
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { ParamIDs::delta, 1 }, "Delta", false));
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { ParamIDs::link, 1 }, "Gain Link", false));
     layout.add (std::make_unique<AudioParameterBool> (ParameterID { ParamIDs::strict, 1 }, "Strict Ceiling", true));
+    layout.add (std::make_unique<AudioParameterBool> (ParameterID { ParamIDs::hq, 1 }, "HQ", false));
     return layout;
 }
 
@@ -70,6 +72,7 @@ rommuser::clipready::ClipParams ClipReadyProcessor::readParams() const
     p.delta = pDelta->load() > 0.5f;
     p.gainLink = pLink->load() > 0.5f;
     p.strictCeiling = pStrict->load() > 0.5f;
+    p.hq = pHq->load() > 0.5f;
     return p;
 }
 

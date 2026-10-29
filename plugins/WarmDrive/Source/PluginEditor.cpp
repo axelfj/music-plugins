@@ -129,6 +129,15 @@ WarmDriveEditor::WarmDriveEditor (WarmDriveProcessor& p)
     addAndMakeVisible (autoGain);
     buttonAttachments.push_back (std::make_unique<ButtonAttachment> (processor.state, ParamIDs::autoGain, autoGain));
 
+    hq.setButtonText ("HQ");
+    hq.setClickingTogglesState (true);
+    hq.setTooltip (tr ("Antialiasing extra (ADAA): mucho menos aliasing con drive alto, a cambio de un poco más de CPU. "
+                       "Con HQ, 2x suena tan limpio como 4x sin HQ.",
+                       "Extra antialiasing (ADAA): far less aliasing at high drive, for a little more CPU. "
+                       "With HQ, 2x is as clean as 4x without it."));
+    addAndMakeVisible (hq);
+    buttonAttachments.push_back (std::make_unique<ButtonAttachment> (processor.state, ParamIDs::hq, hq));
+
     for (int i = 0; i < 3; ++i)
     {
         auto& b = presetButtons[i];
@@ -195,6 +204,11 @@ void WarmDriveEditor::resized()
         auto cell = top.removeFromLeft (gw);
         c.second->setBounds (cell.removeFromTop (px (18)));
         c.first->setBounds (cell.removeFromTop (px (30)).reduced (px (6), px (2)));
+        if (c.first == &oversamplingBox)
+        {
+            cell.removeFromTop (px (8));
+            hq.setBounds (cell.removeFromTop (px (28)).reduced (px (6), px (2)));
+        }
     }
     for (auto& k : xover)
         k.setBounds (top.removeFromLeft (gw));

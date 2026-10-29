@@ -6,6 +6,7 @@ FetchContent_MakeAvailable(Catch2)
 
 add_executable(dsp_tests
     test_oversampler.cpp
+    test_fft.cpp
     test_clipready.cpp
     test_shapeeq.cpp
     test_pressready.cpp

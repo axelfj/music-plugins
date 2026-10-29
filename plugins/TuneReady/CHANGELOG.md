@@ -5,6 +5,7 @@
 - Nuevo nombre: **Tune-R** (antes Tune Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Tune-R** (formerly Tune Ready): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Tune Ready deberían abrir con Tune-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Tune Ready should open with Tune-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Tune Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Tune Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
+- Menos CPU: detección de tono ~2.6x más rápida (4.8 % → 1.8 % de un núcleo): FFT nueva, la mitad de tamaño (la misma correlación exacta) y las dos señales en una sola FFT. / Less CPU: ~2.6x faster pitch detection, same result.
 
 ## 1.0.0-alpha.1
 
