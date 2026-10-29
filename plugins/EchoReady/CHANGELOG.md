@@ -1,11 +1,14 @@
 # Delay-R (antes Echo Ready)
 
+## 1.0.0-alpha.3
+
+- Menos CPU: las líneas de delay usan índices sin división (0.44 % → 0.38 % de un núcleo). / Less CPU: delay lines index without divisions.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Delay-R** (antes Echo Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Delay-R** (formerly Echo Ready): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Echo Ready deberían abrir con Delay-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Echo Ready should open with Delay-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Echo Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Echo Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
-- Menos CPU: las líneas de delay usan índices sin división (0.44 % → 0.38 % de un núcleo). / Less CPU: delay lines index without divisions.
 
 ## 1.0.0-alpha.1
 

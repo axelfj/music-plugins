@@ -1,11 +1,14 @@
 # Synth-R (antes Wave Ready)
 
+## 1.0.0-alpha.3
+
+- Menos CPU en la reverb, el chorus y el delay integrados (motores de Reverb-R y líneas de delay más rápidos). / Less CPU in the built-in reverb, chorus and delay.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Synth-R** (antes Wave Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Synth-R** (formerly Wave Ready): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Wave Ready deberían abrir con Synth-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Wave Ready should open with Synth-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Wave Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Wave Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
-- Menos CPU en la reverb, el chorus y el delay integrados (motores de Reverb-R y líneas de delay más rápidos). / Less CPU in the built-in reverb, chorus and delay.
 
 ## 1.0.0-alpha.1
 

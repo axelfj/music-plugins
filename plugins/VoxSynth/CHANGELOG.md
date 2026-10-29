@@ -1,11 +1,14 @@
 # Vocoder-R (antes Vox Synth)
 
+## 1.0.0-alpha.3
+
+- Menos CPU: detección de tono ~2.7x más rápida (4.5 % → 1.7 % de un núcleo), mismo resultado. / Less CPU: ~2.7x faster pitch detection, same result.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Vocoder-R** (antes Vox Synth). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Vocoder-R** (formerly Vox Synth): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Vox Synth deberían abrir con Vocoder-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Vox Synth should open with Vocoder-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Vox Synth" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Vox Synth" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
-- Menos CPU: detección de tono ~2.7x más rápida (4.5 % → 1.7 % de un núcleo), mismo resultado. / Less CPU: ~2.7x faster pitch detection, same result.
 
 ## 1.0.0-alpha.1
 

@@ -1,11 +1,14 @@
 # Phaser-R (antes Phase Ready)
 
+## 1.0.0-alpha.3
+
+- Menos CPU: ~3x (3.1 % → 1.0 % con 12 etapas). El coeficiente de cada etapa se calcula con una aproximación de tan más precisa que un float y las frecuencias de las etapas con una sola exp2 por muestra. / Less CPU: ~3x, with a float-exact tan approximation and one exp2 per sample.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Phaser-R** (antes Phase Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Phaser-R** (formerly Phase Ready): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Phase Ready deberían abrir con Phaser-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Phase Ready should open with Phaser-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Phase Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Phase Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
-- Menos CPU: ~3x (3.1 % → 1.0 % con 12 etapas). El coeficiente de cada etapa se calcula con una aproximación de tan más precisa que un float y las frecuencias de las etapas con una sola exp2 por muestra. / Less CPU: ~3x, with a float-exact tan approximation and one exp2 per sample.
 
 ## 1.0.0-alpha.1
 
