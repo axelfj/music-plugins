@@ -1,11 +1,14 @@
 # Pitch Delay-R (antes Shimmer Ready)
 
+## 1.0.0-alpha.3
+
+- Menos CPU: ~2x (3.2 % → 1.6 % de un núcleo) por la detección de tono más rápida y la reverb integrada más liviana. / Less CPU: ~2x.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Pitch Delay-R** (antes Shimmer Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Pitch Delay-R** (formerly Shimmer Ready): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Shimmer Ready deberían abrir con Pitch Delay-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Shimmer Ready should open with Pitch Delay-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Shimmer Ready" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Shimmer Ready" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
-- Menos CPU: ~2x (3.2 % → 1.6 % de un núcleo) por la detección de tono más rápida y la reverb integrada más liviana. / Less CPU: ~2x.
 
 ## 1.0.0-alpha.1
 

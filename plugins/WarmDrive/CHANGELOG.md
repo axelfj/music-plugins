@@ -1,12 +1,15 @@
 # Saturator-R (antes Warm Drive)
 
+## 1.0.0-alpha.3
+
+- Menos CPU: sobremuestreo ~2x más rápido con el mismo filtro (2.8 % → 1.3 % de un núcleo). / Less CPU: ~2x faster oversampling with the same filter.
+- Nuevo botón **HQ**: antialiasing por antiderivada (ADAA) en las cinco curvas (Rectify con cuadratura de Gauss), plano hasta 20 kHz y sin peine al mezclar. Quita 11-18 dB de aliasing con drive alto (Tape a 2x: −68 → −85 dBFS) por ~25 % más de CPU. Suma 2 muestras de latencia a 2x y 1 a 4x, que se reportan al DAW. / New **HQ** button: ADAA on all five curves, flat to 20 kHz and comb-free in the mix; 11-18 dB less aliasing at high drive for ~25 % more CPU. Adds 2 samples of latency at 2x, 1 at 4x, reported to the host.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Saturator-R** (antes Warm Drive). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Saturator-R** (formerly Warm Drive): the name now says what the plugin does; the R stands for ROMMUSER.
 - Los proyectos guardados con Warm Drive deberían abrir con Saturator-R y conservar sus ajustes, porque el ID del plugin no cambió; si el DAW no lo encuentra, vuelve a escanear los plugins. / Projects saved with Warm Drive should open with Saturator-R and keep their settings, since the plugin ID did not change; if your DAW cannot find it, rescan your plugins.
 - El instalador de Windows y macOS borra la copia vieja llamada "Warm Drive" para que el DAW no muestre el plugin dos veces (en Linux bórrala a mano). / The Windows and macOS installers remove the old "Warm Drive" copy so the DAW does not list the plugin twice (on Linux, delete it by hand).
-- Menos CPU: sobremuestreo ~2x más rápido con el mismo filtro (2.8 % → 1.3 % de un núcleo). / Less CPU: ~2x faster oversampling with the same filter.
-- Nuevo botón **HQ**: antialiasing por antiderivada (ADAA) en las cinco curvas (Rectify con cuadratura de Gauss), plano hasta 20 kHz y sin peine al mezclar. Quita 11-18 dB de aliasing con drive alto (Tape a 2x: −68 → −85 dBFS) por ~25 % más de CPU. Suma 2 muestras de latencia a 2x y 1 a 4x, que se reportan al DAW. / New **HQ** button: ADAA on all five curves, flat to 20 kHz and comb-free in the mix; 11-18 dB less aliasing at high drive for ~25 % more CPU. Adds 2 samples of latency at 2x, 1 at 4x, reported to the host.
 
 ## 1.0.0-alpha.1
 
