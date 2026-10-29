@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -20,7 +21,7 @@ private:
     bool delta = false, external = false;
 };
 
-class ResTameEditor : public juce::AudioProcessorEditor, private juce::Timer
+class ResTameEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit ResTameEditor (ResTameProcessor&);

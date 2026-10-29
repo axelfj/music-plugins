@@ -260,7 +260,7 @@ void VoxSynthProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 
 juce::AudioProcessorEditor* VoxSynthProcessor::createEditor()
 {
-    return new VoxSynthEditor (*this);
+    return rommuser::ui::createScalableEditor<VoxSynthEditor> (*this);
 }
 
 void VoxSynthProcessor::getStateInformation (juce::MemoryBlock& destData)

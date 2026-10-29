@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -45,7 +46,7 @@ public:
     void mouseUp (const juce::MouseEvent& e) override { juce::TextButton::mouseUp (e); if (onRelease) onRelease(); }
 };
 
-class StutterReadyEditor : public juce::AudioProcessorEditor, private juce::Timer
+class StutterReadyEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit StutterReadyEditor (StutterReadyProcessor&);

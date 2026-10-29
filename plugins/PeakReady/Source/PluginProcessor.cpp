@@ -140,7 +140,7 @@ void PeakReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* PeakReadyProcessor::createEditor()
 {
-    return new PeakReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<PeakReadyEditor> (*this);
 }
 
 void PeakReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

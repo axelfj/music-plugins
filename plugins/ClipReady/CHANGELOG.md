@@ -1,5 +1,11 @@
 # Clipper-R (antes Clip Ready)
 
+## Próxima versión / Next
+
+- Ventana con zoom vectorial: arrastra la esquina o usa el botón de colores (arriba a la derecha) para elegir de 75 % a 250 %; texto, perillas y curvas se ven igual de nítidos a cualquier tamaño. / Vector zoom: drag the corner or use the colour-dots button (top right) for 75 % to 250 %; text, knobs and curves stay sharp at any size.
+- Temas: 7 incluidos (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) y editor para crear los tuyos, solo para este plugin o para todos. El plugin recuerda su tamaño y su tema. / Themes: 7 built in plus an editor to make your own, for this plugin only or for all. The plugin remembers its size and theme.
+- Esquina superior derecha: "R - V1 - FREE". / Top-right corner: "R - V1 - FREE".
+
 ## 1.0.0-alpha.4
 
 - Menos CPU: el sobremuestreo usa la simetría de sus filtros y sumas en paralelo (mismo filtro, mismo sonido): ~2.8x menos CPU a 4x (4.4 % → 1.6 % de un núcleo, estéreo a 48 kHz). / Less CPU: the oversampler exploits its filters' symmetry and parallel sums (same filter, same sound): ~2.8x less CPU at 4x.

@@ -130,7 +130,7 @@ void ClipReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* ClipReadyProcessor::createEditor()
 {
-    return new ClipReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<ClipReadyEditor> (*this);
 }
 
 void ClipReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

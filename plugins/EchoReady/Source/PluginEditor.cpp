@@ -87,8 +87,7 @@ void TapDisplay::paint (juce::Graphics& g)
 
 //==============================================================================
 EchoReadyEditor::EchoReadyEditor (EchoReadyProcessor& p)
-    : AudioProcessorEditor (p),
-      processor (p),
+    : processor (p),
       time (tr ("TIEMPO", "TIME")),
       feedback ("FEEDBACK"),
       lowCut (tr ("CORTE GRAVES", "LOW CUT")),
@@ -170,10 +169,7 @@ EchoReadyEditor::EchoReadyEditor (EchoReadyProcessor& p)
 
     addAndMakeVisible (display);
 
-    setResizable (true, true);
-    setResizeLimits (baseWidth * 3 / 4, baseHeight * 3 / 4, baseWidth * 2, baseHeight * 2);
-    if (auto* c = getConstrainer())
-        c->setFixedAspectRatio ((double) baseWidth / baseHeight);
+    // Laid out at its base size; ScalableEditor zooms it as vectors to any window size.
     setSize (baseWidth, baseHeight);
 
     updateEnablement();
@@ -190,19 +186,7 @@ void EchoReadyEditor::paint (juce::Graphics& g)
     g.fillAll (colours::background);
 
     const float s = (float) getWidth() / baseWidth;
-    auto header = getLocalBounds().removeFromTop (juce::roundToInt (48 * s)).reduced (juce::roundToInt (20 * s), 0);
-
-    g.setColour (colours::text);
-    g.setFont (juce::FontOptions (24.0f * s, juce::Font::bold));
-    g.drawText (juce::String (JucePlugin_Name).toUpperCase(), header, juce::Justification::centredLeft);
-
-    g.setColour (colours::textDim);
-    g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
-                header, juce::Justification::centredRight);
-
-    g.setColour (colours::outline);
-    g.drawHorizontalLine (header.getBottom(), 0.0f, (float) getWidth());
+    drawHeader (g, getLocalBounds().removeFromTop (juce::roundToInt (48 * s)), s);
 }
 
 void EchoReadyEditor::resized()
