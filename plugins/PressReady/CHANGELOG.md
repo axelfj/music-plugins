@@ -3,6 +3,9 @@
 ## 1.0.0-alpha.3
 
 - Bajos sin distorsión con release rápido: el detector de picos sostenía cada pico solo 2 ms, así que con un release corto la ganancia subía y bajaba dentro de cada ciclo de un bajo (−34 dB de THD a 50 Hz con release de 30 ms). Ahora sostiene hasta 10 ms (nunca más de un tercio del release) y lo descuenta del release, así que la perilla sigue marcando el tiempo real: −115 dB de THD. / Clean bass with fast release: the 2 ms peak hold let the gain ride each cycle of a bass note (−34 dB THD at 50 Hz, 30 ms release); it now holds up to 10 ms, taken out of the release so the knob stays accurate (−115 dB).
+- Ventana con zoom vectorial: arrastra la esquina o usa el botón de colores (arriba a la derecha) para elegir de 75 % a 250 %; texto, perillas y curvas se ven igual de nítidos a cualquier tamaño. / Vector zoom: drag the corner or use the colour-dots button (top right) for 75 % to 250 %; text, knobs and curves stay sharp at any size.
+- Temas: 7 incluidos (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) y editor para crear los tuyos, solo para este plugin o para todos. El plugin recuerda su tamaño y su tema. / Themes: 7 built in plus an editor to make your own, for this plugin only or for all. The plugin remembers its size and theme.
+- Esquina superior derecha: "R - V1 - FREE". / Top-right corner: "R - V1 - FREE".
 
 ## 1.0.0-alpha.2
 

@@ -1,5 +1,11 @@
 # Arpeggiator-R (antes Arp Ready)
 
+## Próxima versión / Next
+
+- Ventana con zoom vectorial: arrastra la esquina o usa el botón de colores (arriba a la derecha) para elegir de 75 % a 250 %; texto, perillas y curvas se ven igual de nítidos a cualquier tamaño. / Vector zoom: drag the corner or use the colour-dots button (top right) for 75 % to 250 %; text, knobs and curves stay sharp at any size.
+- Temas: 7 incluidos (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) y editor para crear los tuyos, solo para este plugin o para todos. El plugin recuerda su tamaño y su tema. / Themes: 7 built in plus an editor to make your own, for this plugin only or for all. The plugin remembers its size and theme.
+- Esquina superior derecha: "R - V1 - FREE". / Top-right corner: "R - V1 - FREE".
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Arpeggiator-R** (antes Arp Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Arpeggiator-R** (formerly Arp Ready): the name now says what the plugin does; the R stands for ROMMUSER.

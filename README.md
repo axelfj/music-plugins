@@ -104,6 +104,12 @@ Así se ven por dentro antes de instalarlos. Son capturas reales de cada plugin 
 </tr>
 </table>
 
+## Tamaño y temas
+
+Cada plugin se puede agrandar o achicar arrastrando la esquina de abajo a la derecha, o desde el botón de los tres puntos de colores arriba a la derecha (75 % a 250 %). Toda la interfaz se dibuja como vectores, así que se ve igual de nítida en una laptop o en una pantalla 4K.
+
+En ese mismo botón eliges el tema (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) o creas uno propio: clic en cada color, lo ves cambiar en vivo y lo guardas con un nombre. Cada plugin recuerda su tamaño y su tema. Los temas son archivos `.json` pequeños en `Documentos/ROMMUSER/Themes/`, fáciles de compartir; ver [docs/THEMES.md](docs/THEMES.md).
+
 ## Instalar
 
 Descarga la última versión desde [Releases](https://github.com/axelfj/music-plugins/releases). Cada archivo lleva el nombre del plugin, por ejemplo `EQ-R-Setup-1.0.0-alpha.2.exe`.
@@ -134,7 +140,7 @@ Si cambias una interfaz, vuelve a generar las capturas de la vista previa con `t
 
 ```
 shared/dsp/      DSP común, C++ puro sin JUCE (sobremuestreo, suavizado), probado en tests/
-shared/ui/       Look & feel común y textos bilingües
+shared/ui/       Look & feel, temas, zoom vectorial (ScalableEditor) y textos bilingües
 plugins/<Name>/  Un plugin por carpeta: VERSION, CHANGELOG.md, Source/
 tests/           Pruebas de DSP (Catch2): respuesta, aliasing, latencia, nulos
 installer/       Inno Setup (Windows) y pkgbuild (macOS)

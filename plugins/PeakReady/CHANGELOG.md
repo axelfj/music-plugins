@@ -1,5 +1,11 @@
 # Limiter-R (antes Peak Ready)
 
+## Próxima versión / Next
+
+- Ventana con zoom vectorial: arrastra la esquina o usa el botón de colores (arriba a la derecha) para elegir de 75 % a 250 %; texto, perillas y curvas se ven igual de nítidos a cualquier tamaño. / Vector zoom: drag the corner or use the colour-dots button (top right) for 75 % to 250 %; text, knobs and curves stay sharp at any size.
+- Temas: 7 incluidos (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) y editor para crear los tuyos, solo para este plugin o para todos. El plugin recuerda su tamaño y su tema. / Themes: 7 built in plus an editor to make your own, for this plugin only or for all. The plugin remembers its size and theme.
+- Esquina superior derecha: "R - V1 - FREE". / Top-right corner: "R - V1 - FREE".
+
 ## 1.0.0-alpha.3
 
 - Corrección: el ataque bajaba la ganancia en un escalón `lookahead` muestras antes del pico en vez de en rampa (el mínimo deslizante anulaba la media móvil). Ahora la rampa es suave en forma de S (dos medias móviles en cascada) y llega exacta al pico: 12 dB menos distorsión en Transparente y 9 dB en Punchy con bombo + tono (test nuevo). El techo true-peak se sigue cumpliendo (tests). / Fix: the attack stepped the gain down `lookahead` samples before the peak instead of ramping. The ramp is now a smooth S-curve that still lands exactly on the peak: 12 dB less distortion in Transparent, 9 dB in Punchy.

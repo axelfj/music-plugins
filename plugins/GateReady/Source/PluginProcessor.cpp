@@ -185,7 +185,7 @@ void GateReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* GateReadyProcessor::createEditor()
 {
-    return new GateReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<GateReadyEditor> (*this);
 }
 
 void GateReadyProcessor::getStateInformation (juce::MemoryBlock& destData)
