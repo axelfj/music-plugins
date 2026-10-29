@@ -172,7 +172,7 @@ void TuneReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* TuneReadyProcessor::createEditor()
 {
-    return new TuneReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<TuneReadyEditor> (*this);
 }
 
 void TuneReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

@@ -198,7 +198,7 @@ void DuckReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* DuckReadyProcessor::createEditor()
 {
-    return new DuckReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<DuckReadyEditor> (*this);
 }
 
 void DuckReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

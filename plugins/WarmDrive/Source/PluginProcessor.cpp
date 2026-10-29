@@ -176,7 +176,7 @@ void WarmDriveProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* WarmDriveProcessor::createEditor()
 {
-    return new WarmDriveEditor (*this);
+    return rommuser::ui::createScalableEditor<WarmDriveEditor> (*this);
 }
 
 void WarmDriveProcessor::getStateInformation (juce::MemoryBlock& destData)

@@ -86,7 +86,7 @@ void MasterCheckLiveProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
 juce::AudioProcessorEditor* MasterCheckLiveProcessor::createEditor()
 {
-    return new MasterCheckLiveEditor (*this);
+    return rommuser::ui::createScalableEditor<MasterCheckLiveEditor> (*this);
 }
 
 void MasterCheckLiveProcessor::getStateInformation (juce::MemoryBlock& destData)

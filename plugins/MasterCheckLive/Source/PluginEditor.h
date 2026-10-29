@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -32,7 +33,7 @@ private:
     bool big;
 };
 
-class MasterCheckLiveEditor : public juce::AudioProcessorEditor, private juce::Timer
+class MasterCheckLiveEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit MasterCheckLiveEditor (MasterCheckLiveProcessor&);

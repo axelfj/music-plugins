@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -31,7 +32,7 @@ struct BandColumn
     juce::Label title;
 };
 
-class WarmDriveEditor : public juce::AudioProcessorEditor, private juce::Timer
+class WarmDriveEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit WarmDriveEditor (WarmDriveProcessor&);

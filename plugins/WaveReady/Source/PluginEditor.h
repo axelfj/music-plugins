@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -26,7 +27,7 @@ private:
     float peak = 0.0f;
 };
 
-class WaveReadyEditor : public juce::AudioProcessorEditor, private juce::Timer
+class WaveReadyEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit WaveReadyEditor (WaveReadyProcessor&);
