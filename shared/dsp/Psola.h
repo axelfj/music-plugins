@@ -333,11 +333,27 @@ private:
             const float v = std::fabs (mono[(size_t) ((uint64_t) k & ringMask)]);
             if (v > bestVal) { bestVal = v; best = k; }
         }
+        // Sub-sample peak (parabola through the three samples around it), then lock softly: the mark
+        // sits on the predicted fractional position and moves only part of the way towards the
+        // peak, so the spacing stays the detected (fractional) period instead of jumping between
+        // whole samples, which would jitter the output pitch.
+        const float ym = std::fabs (mono[(size_t) ((uint64_t) (best - 1) & ringMask)]);
+        const float y0 = std::fabs (mono[(size_t) ((uint64_t) best & ringMask)]);
+        const float yp = std::fabs (mono[(size_t) ((uint64_t) (best + 1) & ringMask)]);
+        const float den = ym - 2.0f * y0 + yp;
+        const double peak = (double) best + (std::fabs (den) > 1e-12f ? std::clamp (0.5f * (ym - yp) / den, -0.5f, 0.5f) : 0.0f);
+        double pos = peak;
+        if (! marks.empty() && std::fabs (peak - nextAna) < period * 0.25)
+            pos = nextAna + markLock * (peak - nextAna);
         if (! marks.empty())
-            marks.back().period = (float) ((double) best - marks.back().pos);   // actual spacing
-        marks.push_back ({ (double) best, (float) period });
-        nextAna = (double) best + period;
+            marks.back().period = (float) (pos - marks.back().pos);   // actual spacing
+        marks.push_back ({ pos, (float) period });
+        nextAna = pos + period;
     }
+
+    // How far each mark moves from its predicted position towards the waveform peak: enough to follow
+    // a real voice's pulses, small enough that the spacing stays the detected fractional period.
+    static constexpr double markLock = 0.05;
 
     double sr = 48000.0;
     int maxBlock = 512, channels = 2;
@@ -417,7 +433,7 @@ private:
         {
             const float wgt = 0.5f * (1.0f + std::cos (3.14159265f * (float) j / halfOut));
             const size_t o = (size_t) ((uint64_t) ((int64_t) centre + j) & accMask);
-            const double readPos = mark.pos + ((double) j + frac) * formantRatio;
+            const double readPos = mark.pos + ((double) j - frac) * formantRatio;
             for (int c = 0; c < nch; ++c)
                 acc[(size_t) c][o] += wgt * an.readInterp (c, readPos);
             wsum[o] += wgt;

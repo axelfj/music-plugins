@@ -2,6 +2,7 @@
 
 ## 1.0.0-alpha.3
 
+- Corrección: al cambiar el tono, cada grano se leía corrido por la fracción de muestra hacia el lado contrario, y las marcas de análisis caían en muestras enteras. En voces reales (cuyo período nunca es un número entero de muestras) eso hacía vibrar el tono y sonaba áspero. Ahora las marcas son fraccionarias y siguen el período detectado: el ruido de una quinta hacia arriba baja de −8 dB a −36 dB (diente de sierra a 220 Hz). / Fix: grains read the fractional offset with the wrong sign and analysis marks sat on whole samples, which jittered the shifted pitch on real voices; marks are now fractional and follow the detected period (noise on a fifth-up shift: −8 dB → −36 dB).
 - Menos CPU: detección de tono ~2.6x más rápida (4.8 % → 1.8 % de un núcleo): FFT nueva, la mitad de tamaño (la misma correlación exacta) y las dos señales en una sola FFT. / Less CPU: ~2.6x faster pitch detection, same result.
 
 ## 1.0.0-alpha.2

@@ -32,10 +32,10 @@ its 1/3-octave trend (white noise = 5.6 dB).
 Linux x86-64, GCC 13, Release. Los puntos débiles que muestra esta corrida, cada uno con una mejora
 ya probada en un prototipo / The weak spots in this run, each with a fix already tried in a prototype:
 
-- Tune-R / Vocoder-R: el grano PSOLA se lee corrido por la fracción de muestra al revés y las marcas
-  caen en muestras enteras: −8 dB de ruido en un diente de sierra de 220 Hz subido una quinta
-  (prototipo: −52 dB). / PSOLA grains read the fractional offset with the wrong sign and marks sit on
-  whole samples (prototype: −52 dB).
+- Tune-R / Vocoder-R: el grano PSOLA se leía corrido por la fracción de muestra al revés y las marcas
+  caían en muestras enteras: −8 dB de ruido en un diente de sierra de 220 Hz subido una quinta. Ya
+  corregido en esta corrida (−36 dB). / PSOLA grains read the fractional offset with the wrong sign and
+  marks sat on whole samples (−8 dB); fixed in this run (−36 dB).
 - Clipper-R: el techo estricto recorta a la frecuencia base y deshace el sobremuestreo (−30 dBc a
   cualquier factor; un limitador corto en su lugar: −75 dBc a 4x HQ, mismo pico). / The strict
   ceiling clamps at the base rate and undoes oversampling; a short limiter instead keeps −75 dBc.
@@ -100,9 +100,9 @@ delay        FractionalDelay (Hermite)            error, 12 kHz swept tone      
 delay        FractionalDelay (Hermite)            error, 16 kHz swept tone       -14.5 dBc  
 delay        Phaser-R 12 st fb 0.5                THD, 1 kHz -6 dBFS            -129.1 dB   feedback safety clip
 delay        Phaser-R 12 st fb 0.8                THD, 1 kHz -6 dBFS             -33.8 dB   feedback safety clip
-pitch        Tune-R fixed +7 st                   noise vs target, saw 220        -8.1 dB   mostly +-10 Hz sidebands
-pitch        Tune-R fixed +7 st                   noise vs target, sine 220      -31.5 dB   
-pitch        Vocoder-R harmony +7 st              noise vs target, saw 220        -7.9 dB   
+pitch        Tune-R fixed +7 st                   noise vs target, saw 220       -36.1 dB   
+pitch        Tune-R fixed +7 st                   noise vs target, sine 220      -49.1 dB   
+pitch        Vocoder-R harmony +7 st              noise vs target, saw 220       -36.2 dB   
 reverb       Reverb-R hall 2 s mod 0              RT60 at 125 Hz (target 2)        2.0 s    
 reverb       Reverb-R hall 2 s mod 0              RT60 at 500 Hz (target 2)        1.9 s    
 reverb       Reverb-R hall 2 s mod 0              RT60 at 2000 Hz (target 2)       2.0 s    

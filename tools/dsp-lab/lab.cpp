@@ -473,7 +473,7 @@ void pitch()
     {
         tuneready::TuneEngine e; e.prepare (sr, block, 2);
         tuneready::TuneParams p; p.mode = tuneready::Mode::fixed; p.fixedSemis = 7.0f; e.setParams (p, true);
-        print ("pitch", "Tune-R fixed +7 st", "noise vs target, saw 220", purity (run (procOf (e), saw (settle + N)), settle), "dB", "mostly +-10 Hz sidebands");
+        print ("pitch", "Tune-R fixed +7 st", "noise vs target, saw 220", purity (run (procOf (e), saw (settle + N)), settle), "dB");
         print ("pitch", "Tune-R fixed +7 st", "noise vs target, sine 220", purity (run (procOf (e), sine (f0, 0.5, settle + N)), settle), "dB");
     }
     if (wanted ("Vocoder-R"))
