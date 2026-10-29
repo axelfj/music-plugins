@@ -1,5 +1,9 @@
 # Clipper-R (antes Clip Ready)
 
+## 1.0.0-alpha.5
+
+- Techo estricto más limpio: antes recortaba de golpe los pequeños picos que deja el filtro del sobremuestreo, y ese recorte devolvía el aliasing que el sobremuestreo había quitado (−30 dBc a 2x, 4x u 8x en un tono de 7 kHz empujado 12 dB). Ahora una rampa de ganancia de 1 ms baja solo esos picos: 4x mide −50 dBc y 4x HQ −75 dBc, con el pico igual de exacto en el techo. Suma 1 ms de latencia con el techo estricto, que se reporta al DAW. / Cleaner strict ceiling: the clamp after downsampling put the aliasing back (−30 dBc at any factor); a 1 ms lookahead gain ramp now trims the filter overshoot instead (4x −50 dBc, 4x HQ −75 dBc, same exact peak). Adds 1 ms of latency with the strict ceiling, reported to the host.
+
 ## 1.0.0-alpha.4
 
 - Menos CPU: el sobremuestreo usa la simetría de sus filtros y sumas en paralelo (mismo filtro, mismo sonido): ~2.8x menos CPU a 4x (4.4 % → 1.6 % de un núcleo, estéreo a 48 kHz). / Less CPU: the oversampler exploits its filters' symmetry and parallel sums (same filter, same sound): ~2.8x less CPU at 4x.

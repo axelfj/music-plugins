@@ -194,9 +194,9 @@ ClipReadyEditor::ClipReadyEditor (ClipReadyProcessor& p)
               "Hear only what the clipper removes. If it sounds like heavy distortion, back off.") },
         { &strict, ParamIDs::strict, tr ("TECHO ESTRICTO", "STRICT CEILING"),
           tr ("Encendido: lo que sale del plugin nunca pasa del techo, aunque subas Salida o uses Mix (ideal en el master). "
-              "Apagado: un poco más limpio, pero puede pasar el techo. DELTA no se limita.",
+              "Apagado: 1 ms menos de latencia, pero puede pasar el techo. DELTA no se limita.",
               "On: nothing leaving the plugin goes above the ceiling, even with Output or Mix (best on the master). "
-              "Off: slightly cleaner, but it can go over the ceiling. DELTA is never limited.") },
+              "Off: 1 ms less latency, but it can go over the ceiling. DELTA is never limited.") },
         { &hq, ParamIDs::hq, "HQ",
           tr ("Antialiasing extra (ADAA): mucho menos aliasing al recortar fuerte, a cambio de un poco más de CPU. "
               "Con HQ, 2x suena tan limpio como 4x sin HQ.",

@@ -34,12 +34,13 @@ std::vector<float> run (const ClipParams& p, std::vector<float> x, ClipMeters* m
     return x;
 }
 
-int latencyFor (int factor)
+int latencyFor (int factor, bool strictCeiling = true)
 {
     ClipEngine e;
     e.prepare (fs, 512, 1);
     ClipParams p;
     p.oversampling = factor;
+    p.strictCeiling = strictCeiling;
     e.setParams (p, true);
     return e.getLatencySamples();
 }
@@ -74,7 +75,7 @@ TEST_CASE ("Mix at 0% returns the input exactly, delayed by the reported latency
     p.strictCeiling = false; // with strict on, dry peaks above the ceiling would be clamped (by design)
     const auto in = whiteNoise (20000, 0.9);
     const auto out = run (p, in);
-    const int lat = latencyFor (factor);
+    const int lat = latencyFor (factor, false);
     for (size_t i = (size_t) lat; i < out.size(); ++i)
         REQUIRE (out[i] == in[i - (size_t) lat]);
 }
@@ -145,6 +146,7 @@ TEST_CASE ("Delta plus the clipped signal reconstructs the gained dry signal", "
     ClipParams p;
     p.inputDb = 9.0f;
     p.oversampling = 4;
+    p.strictCeiling = false; // the strict guard trims the filter's overshoot after the mix; delta leaves it out
     const auto in = whiteNoise (20000, 0.7);
 
     auto wetP = p;
@@ -154,7 +156,7 @@ TEST_CASE ("Delta plus the clipped signal reconstructs the gained dry signal", "
     const auto delta = run (deltaP, in);
 
     const float g = std::pow (10.0f, 9.0f / 20.0f);
-    const int lat = latencyFor (4);
+    const int lat = latencyFor (4, false);
     for (size_t i = (size_t) lat; i < in.size(); ++i)
         REQUIRE (std::fabs (wet[i] + delta[i] - g * in[i - (size_t) lat]) < 1e-5f);
 }
@@ -212,6 +214,28 @@ TEST_CASE ("Oversampling keeps clipping aliases low", "[clipready][aliasing]")
     WARN ("alias level x" << c.factor << " softness " << c.softness << ": " << alias << " dBFS");
     if (c.maxAliasDb < 0.0)
         REQUIRE (alias < c.maxAliasDb);
+}
+
+TEST_CASE ("The strict ceiling keeps the oversampling's low aliasing", "[clipready][aliasing]")
+{
+    // The downsampled wet rings above the ceiling. A clamp at the base rate used to put the aliasing
+    // back (about -30 dBc here at any factor); the lookahead guard must not.
+    const bool hq = GENERATE (false, true);
+    ClipParams p;
+    p.oversampling = 4;
+    p.hq = hq;
+    p.softness = 0.0f;
+    p.inputDb = 12.0f;
+    p.ceilingDb = -0.3f;
+    p.strictCeiling = true;
+    const size_t n = 1 << 15;
+    const double f0 = fs * 4775.0 / (double) n; // ~7 kHz, bin-centred
+    const auto out = run (p, sine (f0, fs, (int) n + 8192, 0.5));
+    const auto spec = powerSpectrum (out.data() + 8192, n);
+    const double rel = inharmonicLevelDb (spec, fs, n, f0, 20.0, 20000.0) - toneLevelDb (spec, fs, n, f0);
+    INFO ("hq " << hq << " alias " << rel << " dBc");
+    REQUIRE (rel < (hq ? -65.0 : -45.0));
+    REQUIRE (peak (out) <= std::pow (10.0f, -0.3f / 20.0f) + 1e-6f);
 }
 
 TEST_CASE ("Without strict ceiling the overshoot stays small", "[clipready]")

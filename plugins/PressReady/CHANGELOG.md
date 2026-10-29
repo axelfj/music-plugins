@@ -1,5 +1,9 @@
 # Compressor-R (antes Press Ready)
 
+## 1.0.0-alpha.3
+
+- Bajos sin distorsión con release rápido: el detector de picos sostenía cada pico solo 2 ms, así que con un release corto la ganancia subía y bajaba dentro de cada ciclo de un bajo (−34 dB de THD a 50 Hz con release de 30 ms). Ahora sostiene hasta 10 ms (nunca más de un tercio del release) y lo descuenta del release, así que la perilla sigue marcando el tiempo real: −115 dB de THD. / Clean bass with fast release: the 2 ms peak hold let the gain ride each cycle of a bass note (−34 dB THD at 50 Hz, 30 ms release); it now holds up to 10 ms, taken out of the release so the knob stays accurate (−115 dB).
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Compressor-R** (antes Press Ready). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Compressor-R** (formerly Press Ready): the name now says what the plugin does; the R stands for ROMMUSER.

@@ -16,6 +16,7 @@
 
 #include "../../../shared/dsp/Adaa.h"
 #include "../../../shared/dsp/Oversampler.h"
+#include "../../../shared/dsp/PeakGuard.h"
 #include "../../../shared/dsp/Smoothing.h"
 
 #include <algorithm>
@@ -37,7 +38,7 @@ struct ClipParams
     int oversampling = 4;     // 1, 2, 4, 8
     bool delta = false;
     bool gainLink = false;    // output follows -input so loudness stays comparable
-    bool strictCeiling = true; // hard-limit wet after downsampling AND the final output (incl. Mix/Output), so the sample peak never passes the ceiling
+    bool strictCeiling = true; // the final output (incl. Mix/Output) never passes the ceiling: a 1 ms lookahead guard, then a clamp
     bool hq = false;           // antiderivative antialiasing on top of oversampling (shared/dsp/Adaa.h)
 };
 
@@ -85,6 +86,10 @@ class ClipEngine
 public:
     static constexpr int maxChannels = 2;
     static constexpr std::array<int, 4> factors { 1, 2, 4, 8 };
+    // Strict ceiling: the downsampling filter rings a little above the ceiling (up to ~0.7 dB). A hard
+    // clamp at the base rate would put back the aliasing the oversampling removed (4x HQ: -75 -> -30 dBc
+    // on a 7 kHz tone pushed 12 dB), so a short lookahead gain ramp pulls those peaks under instead.
+    static constexpr float guardLookaheadMs = 1.0f, guardReleaseMs = 50.0f;
 
     void prepare (double sampleRate, int maxBlockSize, int numChannels)
     {
@@ -105,6 +110,9 @@ public:
 
         pre.assign ((size_t) maxBlockSize, 0.0f);
         wet.assign ((size_t) maxBlockSize, 0.0f);
+        guard.prepare (sampleRate, (int) std::lround (sampleRate * guardLookaheadMs / 1000.0), guardReleaseMs);
+        for (auto& d : guardDelay) d.setDelay (guard.getLatencySamples());
+        ceilingDelay.setDelay (guard.getLatencySamples());
 
         for (auto* s : { &inGain, &ceiling, &outGain, &mix, &softness, &linkComp })
             s->prepare (sampleRate, 0.02);
@@ -123,12 +131,21 @@ public:
             dryDelay[(size_t) c].reset();
             adaa[(size_t) c].reset();
             hqComp[(size_t) c].reset();
+            guardDelay[(size_t) c].reset();
         }
+        guard.reset();
+        ceilingDelay.reset();
     }
 
     void setParams (const ClipParams& p, bool immediate = false)
     {
         const bool hqChanged = p.hq != params.hq;
+        if (p.strictCeiling != params.strictCeiling)
+        {
+            guard.reset();
+            for (auto& d : guardDelay) d.reset();
+            ceilingDelay.reset();
+        }
         params = p;
 
         int idx = 2;
@@ -144,7 +161,7 @@ public:
                 adaa[(size_t) c].reset();
                 hqComp[(size_t) c].prepare (factors[(size_t) idx]);
             }
-            const int lat = getLatencySamples();
+            const int lat = coreLatency();
             for (int c = 0; c < maxChannels; ++c)
             {
                 dryDelay[(size_t) c].setDelay (lat);
@@ -167,8 +184,7 @@ public:
 
     int getLatencySamples() const
     {
-        const auto& o = oversamplers[0u][(size_t) std::max (0, currentFactorIndex)];
-        return (o ? o->getLatencySamples() : 0) + (params.hq ? hqComp[0].getLatencyBaseSamples() : 0);
+        return coreLatency() + (params.strictCeiling ? guard.getLatencySamples() : 0);
     }
 
     // Processes numChannels buffers of n samples in place. n must not exceed the prepared block size;
@@ -187,6 +203,13 @@ public:
     }
 
 private:
+    // Oversampling (+ HQ compensation): what the dry path is delayed by. The ceiling guard comes after the mix.
+    int coreLatency() const
+    {
+        const auto& o = oversamplers[0u][(size_t) std::max (0, currentFactorIndex)];
+        return (o ? o->getLatencySamples() : 0) + (params.hq ? hqComp[0].getLatencyBaseSamples() : 0);
+    }
+
     void processChunk (float* const* io, int numChannels, int offset, int n, ClipMeters& meters)
     {
         // Snapshot smoother state so every channel sees the same ramp.
@@ -248,11 +271,9 @@ private:
             {
                 const float g = sIn.next();
                 const float ce = wet[(size_t) i];
-                // Downsampling filters ring slightly above the ceiling. Strict mode hard-limits that
-                // overshoot so the sample peak never crosses the ceiling, at the cost of some aliasing
-                // when driven hard; off keeps the oversampled result untouched (cleaner, may peak a bit over).
-                const float v = pre[(size_t) i];
-                const float w = (params.strictCeiling ? std::clamp (v, -1.0f, 1.0f) : v) * ce;
+                // Downsampling filters ring slightly above the ceiling; strict mode deals with that in
+                // the guard below, after the mix. Off keeps the result untouched (may peak a bit over).
+                const float w = pre[(size_t) i] * ce;
                 const float d = dryDelay[ci].process (x[i]);
                 const float m = sMix.next();
                 const float o = sOut.next();
@@ -266,19 +287,41 @@ private:
                 else
                 {
                     y = o * (m * w * lc + (1.0f - m) * d);
-                    // The ceiling is a promise about what leaves the plugin, so it also covers the dry
-                    // share of Mix and the Output gain. Dry material below the ceiling is untouched.
-                    if (params.strictCeiling)
-                        y = std::clamp (y, -ce, ce);
                 }
 
                 x[i] = y;
-                meters.outputPeak = std::max (meters.outputPeak, std::fabs (y));
+                if (! params.strictCeiling)
+                    meters.outputPeak = std::max (meters.outputPeak, std::fabs (y));
             }
 
             if (c == numChannels - 1)
             {
                 inGain = sIn; ceiling = sCeil; outGain = sOut; mix = sMix; softness = sSoft; linkComp = sLink;
+            }
+        }
+
+        // The ceiling is a promise about what leaves the plugin, so it also covers the dry share of Mix
+        // and the Output gain: one gain for all channels, ramped in ahead of each peak, then a clamp
+        // that only catches rounding. Material below the ceiling passes untouched (gain exactly 1).
+        // Delta (monitoring) is not limited on purpose but keeps the same delay.
+        if (params.strictCeiling && numChannels > 0)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                float peak = 0.0f;
+                for (int c = 0; c < numChannels; ++c)
+                    peak = std::max (peak, std::fabs (io[c][offset + i]));
+                const float ce = wet[(size_t) i];
+                const float g = params.delta ? 1.0f : guard.process (peak, ce);
+                const float ceDue = ceilingDelay.process (ce);
+                for (int c = 0; c < numChannels; ++c)
+                {
+                    float y = guardDelay[(size_t) c].process (io[c][offset + i]) * g;
+                    if (! params.delta)
+                        y = std::clamp (y, -ceDue, ceDue);
+                    io[c][offset + i] = y;
+                    meters.outputPeak = std::max (meters.outputPeak, std::fabs (y));
+                }
             }
         }
 
@@ -294,6 +337,9 @@ private:
     std::array<dsp::DelayLine, (size_t) maxChannels> dryDelay;
     std::array<dsp::Adaa1, (size_t) maxChannels> adaa;
     std::array<dsp::AdaaCompensator, (size_t) maxChannels> hqComp;
+    dsp::PeakGuard guard;
+    std::array<dsp::DelayLine, (size_t) maxChannels> guardDelay;
+    dsp::DelayLine ceilingDelay;
     std::vector<float> pre, wet;
     dsp::LinearSmoother inGain, ceiling, outGain, mix, softness, linkComp;
 };

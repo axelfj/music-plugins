@@ -192,7 +192,7 @@ void saturation()
     using namespace rommuser;
     // "strict" is the default guaranteed sample-peak ceiling (a clamp after downsampling).
     struct C { std::string name; int os; bool hq; float soft; bool strict; };
-    for (const C& c : { C { "Clipper-R hard 4x strict", 4, false, 0.0f, true }, C { "Clipper-R hard 2x HQ strict", 2, true, 0.0f, true },
+    for (const C& c : { C { "Clipper-R hard 4x strict", 4, false, 0.0f, true }, C { "Clipper-R hard 2x HQ strict", 2, true, 0.0f, true }, C { "Clipper-R hard 4x HQ strict", 4, true, 0.0f, true },
                         C { "Clipper-R hard 8x strict", 8, false, 0.0f, true }, C { "Clipper-R soft 4x strict", 4, false, 0.35f, true },
                         C { "Clipper-R hard 2x", 2, false, 0.0f, false }, C { "Clipper-R hard 4x", 4, false, 0.0f, false },
                         C { "Clipper-R hard 2x HQ", 2, true, 0.0f, false }, C { "Clipper-R hard 4x HQ", 4, true, 0.0f, false },
@@ -229,7 +229,7 @@ void dynamics()
         pressready::CompParams p; p.thresholdDb = -24.0f; p.ratio = 4.0f; p.attackMs = 1.0f; p.releaseMs = 30.0f; p.detector = det;
         e.setParams (p, true);
         Proc pr = [&] (float* const* io, int n) { e.process (io, nullptr, 2, n); };
-        print ("dynamics", name, "THD, 50 Hz -6 dBFS", thdDb (toneTest (pr, 50.0, 0.5)), "dB", "release ripple distorts bass");
+        print ("dynamics", name, "THD, 50 Hz -6 dBFS", thdDb (toneTest (pr, 50.0, 0.5)), "dB", "peak vs rms detector");
     }
     for (auto ch : { pressready::Character::punch, pressready::Character::glue })
     {
