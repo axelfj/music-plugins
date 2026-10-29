@@ -225,3 +225,48 @@ TEST_CASE ("Only the driven band is distorted: a clean band next to a saturated 
     // The low band did get squashed.
     REQUIRE (toneDb (out, 40.0, 24000) < toDb (0.5) - 3.0);
 }
+
+TEST_CASE ("HQ (ADAA) lowers aliasing for every curve at the same oversampling", "[aliasing][hq]")
+{
+    const auto type = GENERATE (Saturation::tape, Saturation::tube, Saturation::transistor, Saturation::softClip, Saturation::rectify);
+    const int factor = GENERATE (1, 2);
+
+    DriveParams p;
+    p.numBands = 1;
+    p.autoGain = false;
+    p.bands[0].type = type;
+    p.bands[0].driveDb = 18.0f;
+    p.oversampling = factor;
+
+    const size_t n = 1 << 15;
+    const double f0 = fs * 3715.0 / (double) n;
+    double alias[2];
+    for (int hq = 0; hq < 2; ++hq)
+    {
+        p.hq = hq == 1;
+        const auto out = run (p, sine (f0, fs, (int) n + 8192, 0.5));
+        const auto spec = powerSpectrum (out.data() + 8192, n);
+        alias[hq] = inharmonicLevelDb (spec, fs, n, f0, 20.0, 20000.0);
+    }
+    WARN ("type " << (int) type << " " << factor << "x alias normal " << alias[0] << " / HQ " << alias[1] << " dBFS");
+    REQUIRE (alias[1] < alias[0] - 6.0);
+}
+
+TEST_CASE ("HQ keeps the level and the mix stays comb-free", "[hq]")
+{
+    // At low drive the curve is almost linear: HQ must not change the level of a mid tone, and a
+    // 50 % band mix must not comb (dry and wet get the same two-sample average).
+    DriveParams p;
+    p.numBands = 1;
+    p.autoGain = false;
+    p.hq = true;
+    p.oversampling = 2;
+    p.bands[0].driveDb = 0.0f;
+    p.bands[0].mix = 0.5f;
+    for (double f : { 1000.0, 10000.0 })
+    {
+        const auto out = run (p, sine (f, fs, 48000, 0.01));
+        INFO ("freq " << f);
+        REQUIRE (toneDb (out, f, 24000) == Catch::Approx (toDb (0.01)).margin (0.25));
+    }
+}

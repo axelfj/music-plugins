@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -33,7 +34,7 @@ private:
     juce::RangedAudioParameter* releaseParam = nullptr;
 };
 
-class DuckReadyEditor : public juce::AudioProcessorEditor, private juce::Timer
+class DuckReadyEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit DuckReadyEditor (DuckReadyProcessor&);

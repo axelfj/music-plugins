@@ -159,7 +159,7 @@ void ShimmerReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
 
 juce::AudioProcessorEditor* ShimmerReadyProcessor::createEditor()
 {
-    return new ShimmerReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<ShimmerReadyEditor> (*this);
 }
 
 void ShimmerReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

@@ -93,12 +93,17 @@ public:
         sr = sampleRate;
         half = (int) std::ceil (sr / std::clamp ((double) minHz, 30.0, 200.0));   // one period of the lowest pitch
         window = 2 * half;
+        // Circular correlation of length N >= window has no wrap-around for the lags we read:
+        // j < half and tau < half, so j + tau < window. (window + half would only pad zeros.)
         int order = 1;
-        while ((1 << order) < window + half) ++order;
+        while ((1 << order) < window) ++order;
         fft.prepare (order);
         fftSize = 1 << order;
         a.resize ((size_t) fftSize);
         b.resize ((size_t) fftSize);
+        work.resize ((size_t) fftSize);
+        realA.resize ((size_t) fftSize);
+        realB.resize ((size_t) fftSize);
         d.resize ((size_t) half);
         prefix.resize ((size_t) window + 1);
         tauMin = std::max (2, (int) std::floor (sr / maxDetectHz));
@@ -115,15 +120,19 @@ public:
         if (energyY < (double) half * 1e-8)   // below ~ -80 dBFS rms
             return est;
 
-        // r(tau) = sum_{j<half} x[j] x[j+tau] via FFT correlation.
+        // r(tau) = sum_{j<half} x[j] x[j+tau] via FFT correlation. Both inputs are real, so one
+        // complex FFT transforms the two of them; the product is written out by hand.
         for (int i = 0; i < fftSize; ++i)
         {
-            a[(size_t) i] = i < window ? FFT::Complex (x[i], 0.0f) : FFT::Complex (0.0f, 0.0f);
-            b[(size_t) i] = i < half ? FFT::Complex (x[i], 0.0f) : FFT::Complex (0.0f, 0.0f);
+            realA[(size_t) i] = i < window ? x[i] : 0.0f;
+            realB[(size_t) i] = i < half ? x[i] : 0.0f;
         }
-        fft.forward (a.data());
-        fft.forward (b.data());
-        for (int i = 0; i < fftSize; ++i) a[(size_t) i] *= std::conj (b[(size_t) i]);
+        fft.forwardTwoReal (realA.data(), realB.data(), work.data(), a.data(), b.data());
+        for (int i = 0; i < fftSize; ++i)
+        {
+            const auto p = a[(size_t) i], q = b[(size_t) i]; // p * conj (q)
+            a[(size_t) i] = { p.real() * q.real() + p.imag() * q.imag(), p.imag() * q.real() - p.real() * q.imag() };
+        }
         fft.inverse (a.data());
 
         // Difference function and cumulative mean normalisation.
@@ -174,7 +183,8 @@ private:
     int window = 2048, half = 1024, fftSize = 4096, tauMin = 40;
     float threshold = 0.1f, voicedThreshold = 0.25f;
     FFT fft;
-    std::vector<FFT::Complex> a, b;
+    std::vector<FFT::Complex> a, b, work;
+    std::vector<float> realA, realB;
     std::vector<float> d;
     std::vector<double> prefix;
 };
@@ -323,11 +333,27 @@ private:
             const float v = std::fabs (mono[(size_t) ((uint64_t) k & ringMask)]);
             if (v > bestVal) { bestVal = v; best = k; }
         }
+        // Sub-sample peak (parabola through the three samples around it), then lock softly: the mark
+        // sits on the predicted fractional position and moves only part of the way towards the
+        // peak, so the spacing stays the detected (fractional) period instead of jumping between
+        // whole samples, which would jitter the output pitch.
+        const float ym = std::fabs (mono[(size_t) ((uint64_t) (best - 1) & ringMask)]);
+        const float y0 = std::fabs (mono[(size_t) ((uint64_t) best & ringMask)]);
+        const float yp = std::fabs (mono[(size_t) ((uint64_t) (best + 1) & ringMask)]);
+        const float den = ym - 2.0f * y0 + yp;
+        const double peak = (double) best + (std::fabs (den) > 1e-12f ? std::clamp (0.5f * (ym - yp) / den, -0.5f, 0.5f) : 0.0f);
+        double pos = peak;
+        if (! marks.empty() && std::fabs (peak - nextAna) < period * 0.25)
+            pos = nextAna + markLock * (peak - nextAna);
         if (! marks.empty())
-            marks.back().period = (float) ((double) best - marks.back().pos);   // actual spacing
-        marks.push_back ({ (double) best, (float) period });
-        nextAna = (double) best + period;
+            marks.back().period = (float) (pos - marks.back().pos);   // actual spacing
+        marks.push_back ({ pos, (float) period });
+        nextAna = pos + period;
     }
+
+    // How far each mark moves from its predicted position towards the waveform peak: enough to follow
+    // a real voice's pulses, small enough that the spacing stays the detected fractional period.
+    static constexpr double markLock = 0.05;
 
     double sr = 48000.0;
     int maxBlock = 512, channels = 2;
@@ -407,7 +433,7 @@ private:
         {
             const float wgt = 0.5f * (1.0f + std::cos (3.14159265f * (float) j / halfOut));
             const size_t o = (size_t) ((uint64_t) ((int64_t) centre + j) & accMask);
-            const double readPos = mark.pos + ((double) j + frac) * formantRatio;
+            const double readPos = mark.pos + ((double) j - frac) * formantRatio;
             for (int c = 0; c < nch; ++c)
                 acc[(size_t) c][o] += wgt * an.readInterp (c, readPos);
             wsum[o] += wgt;

@@ -26,7 +26,8 @@ Primera versión pública para probar. / First public test build.
 - La interfaz muestra el espectro de entrada y el de salida. / The interface shows the input and output spectrum.
   - Muestra el intervalo con su nombre (por ejemplo "Quinta justa arriba") y la nota más fuerte antes y después (A2 → E3). / It shows the interval by name ("Perfect fifth up") and the loudest note before and after (A2 → E3).
   - Tiene botones de intervalos rápidos. / It has quick interval buttons.
-  - Está en español o inglés según el idioma del sistema, y es redimensionable. / It is in Spanish or English depending on the system language, and resizable.
+  - Está en español o inglés según el idioma del sistema. / It is in Spanish or English depending on the system language.
+  - Zoom vectorial de 75 a 250 % y los temas compartidos (ROMMUSER, Claro, Neón...), igual que el resto de plugins. / Vector zoom from 75 to 250 % and the shared themes (ROMMUSER, Light, Neon...), like every other plugin.
 - Formatos: VST3 y CLAP en Windows, macOS y Linux, y AU en macOS. / Formats: VST3 and CLAP on Windows, macOS and Linux, plus AU on macOS.
 
 Pendiente para 1.0.x / Planned for 1.0.x:

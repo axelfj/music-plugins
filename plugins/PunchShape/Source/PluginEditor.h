@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -24,7 +25,7 @@ private:
     int head = 0;
 };
 
-class PunchShapeEditor : public juce::AudioProcessorEditor, private juce::Timer
+class PunchShapeEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit PunchShapeEditor (PunchShapeProcessor&);

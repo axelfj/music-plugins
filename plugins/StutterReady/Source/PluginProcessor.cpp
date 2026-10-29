@@ -283,7 +283,7 @@ void StutterReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce
 
 juce::AudioProcessorEditor* StutterReadyProcessor::createEditor()
 {
-    return new StutterReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<StutterReadyEditor> (*this);
 }
 
 void StutterReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

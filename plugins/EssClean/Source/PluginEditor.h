@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -46,7 +47,7 @@ private:
     int holdFrames = 0;
 };
 
-class EssCleanEditor : public juce::AudioProcessorEditor, private juce::Timer
+class EssCleanEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit EssCleanEditor (EssCleanProcessor&);

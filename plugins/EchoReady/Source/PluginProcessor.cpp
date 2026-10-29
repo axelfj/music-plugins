@@ -169,7 +169,7 @@ void EchoReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* EchoReadyProcessor::createEditor()
 {
-    return new EchoReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<EchoReadyEditor> (*this);
 }
 
 void EchoReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

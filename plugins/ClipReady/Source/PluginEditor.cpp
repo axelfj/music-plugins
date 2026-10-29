@@ -131,8 +131,7 @@ void ClipMeter::paint (juce::Graphics& g)
 
 //==============================================================================
 ClipReadyEditor::ClipReadyEditor (ClipReadyProcessor& p)
-    : AudioProcessorEditor (p),
-      processor (p),
+    : processor (p),
       input (tr ("ENTRADA", "INPUT")),
       ceiling (tr ("TECHO", "CEILING")),
       softness (tr ("SUAVIDAD", "SOFTNESS")),
@@ -197,6 +196,11 @@ ClipReadyEditor::ClipReadyEditor (ClipReadyProcessor& p)
               "Apagado: un poco más limpio, pero puede pasar el techo. DELTA no se limita.",
               "On: nothing leaving the plugin goes above the ceiling, even with Output or Mix (best on the master). "
               "Off: slightly cleaner, but it can go over the ceiling. DELTA is never limited.") },
+        { &hq, ParamIDs::hq, "HQ",
+          tr ("Antialiasing extra (ADAA): mucho menos aliasing al recortar fuerte, a cambio de un poco más de CPU. "
+              "Con HQ, 2x suena tan limpio como 4x sin HQ.",
+              "Extra antialiasing (ADAA): far less aliasing when clipping hard, for a little more CPU. "
+              "With HQ, 2x is as clean as 4x without it.") },
     };
     for (const auto& b : buttons)
     {
@@ -212,10 +216,7 @@ ClipReadyEditor::ClipReadyEditor (ClipReadyProcessor& p)
                                 (juce::Component*) &outMeter, (juce::Component*) &clipMeter })
         addAndMakeVisible (c);
 
-    setResizable (true, true);
-    setResizeLimits (baseWidth * 3 / 4, baseHeight * 3 / 4, baseWidth * 2, baseHeight * 2);
-    if (auto* c = getConstrainer())
-        c->setFixedAspectRatio ((double) baseWidth / baseHeight);
+    // Laid out at its base size; ScalableEditor zooms it as vectors to any window size.
     setSize (baseWidth, baseHeight);
 
     startTimerHz (30);
@@ -231,19 +232,7 @@ void ClipReadyEditor::paint (juce::Graphics& g)
     g.fillAll (colours::background);
 
     const float s = (float) getWidth() / baseWidth;
-    auto header = getLocalBounds().removeFromTop (juce::roundToInt (52 * s)).reduced (juce::roundToInt (20 * s), 0);
-
-    g.setColour (colours::text);
-    g.setFont (juce::FontOptions (24.0f * s, juce::Font::bold));
-    g.drawText (juce::String (JucePlugin_Name).toUpperCase(), header, juce::Justification::centredLeft);
-
-    g.setColour (colours::textDim);
-    g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
-                header, juce::Justification::centredRight);
-
-    g.setColour (colours::outline);
-    g.drawHorizontalLine (header.getBottom(), 0.0f, (float) getWidth());
+    drawHeader (g, getLocalBounds().removeFromTop (juce::roundToInt (52 * s)), s);
 }
 
 void ClipReadyEditor::resized()
@@ -266,13 +255,14 @@ void ClipReadyEditor::resized()
     // Bottom: buttons.
     auto bottom = r.removeFromBottom (px (34));
     r.removeFromBottom (px (12));
-    const int bw = bottom.getWidth() / 4;
-    auto osArea = bottom.removeFromLeft (bw);
+    const int bw = bottom.getWidth() * 2 / 11;        // four buttons + a 1.5-wide quality cell
+    auto osArea = bottom.removeFromLeft (bw * 3 / 2);
     oversamplingLabel.setBounds (osArea.removeFromLeft (osArea.getWidth() / 2));
     oversampling.setBounds (osArea.reduced (px (4), px (3)));
     link.setBounds (bottom.removeFromLeft (bw).reduced (px (4), 0));
     delta.setBounds (bottom.removeFromLeft (bw).reduced (px (4), 0));
-    strict.setBounds (bottom.reduced (px (4), 0));
+    strict.setBounds (bottom.removeFromLeft (bw).reduced (px (4), 0));
+    hq.setBounds (bottom.reduced (px (4), 0));
 
     // Top row: curve + main knobs; second row: utility knobs.
     auto top = r.removeFromTop (r.getHeight() * 55 / 100);

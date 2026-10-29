@@ -186,3 +186,39 @@ TEST_CASE ("Auto gain compensates a broad boost", "[shapeeq]")
     REQUIRE (comp < -2.0);
     REQUIRE (comp > -6.0);
 }
+
+
+TEST_CASE ("EQ automation is independent of host block partitioning", "[shapeeq][regression]")
+{
+    auto render = [] (int block, int prepared) {
+        EqEngine engine;
+        engine.prepare (48000.0, prepared, 2);
+        EqParams p;
+        p.bands[0].enabled = true;
+        p.bands[0].placement = Placement::mid;
+        engine.setParams (p, true);
+        p.bands[0].gainDb = 18.0;
+        p.bands[0].freq = 2300.0;
+        std::vector<float> left (4096), right (4096);
+        for (size_t i = 0; i < left.size(); ++i)
+            left[i] = right[i] = 0.1f * std::sin (float (i) * 0.13f);
+        for (int i = 0; i < (int) left.size(); i += block)
+        {
+            // This is what PluginProcessor does on each callback.
+            engine.setParams (p);
+            float* io[] = { left.data() + i, right.data() + i };
+            engine.process (io, 2, std::min (block, (int) left.size() - i));
+        }
+        return left;
+    };
+    const auto baseline = render (512, 512);
+    for (int block : { 1, 7, 16, 31, 32, 63, 127, 513 })
+    {
+        const auto output = render (block, 1);
+        for (size_t i = 0; i < output.size(); ++i)
+        {
+            REQUIRE (std::isfinite (output[i]));
+            REQUIRE (std::fabs (output[i] - baseline[i]) < 1e-6f);
+        }
+    }
+}

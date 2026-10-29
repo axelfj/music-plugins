@@ -8,8 +8,14 @@
 // paramID=value pairs (plain units, e.g. semitones=7) set parameters first, for plugins whose
 // defaults would show nothing happening; render.sh reads them from plugins/<Name>/SCREENSHOT_PARAMS.
 // On Linux run it under xvfb-run; tools/screenshot/render.sh does all of this for every plugin.
+//
+// Themes: ROMMUSER_THEME=<name> opens with that theme. ROMMUSER_SWITCH_THEME=<name> switches to
+// it while the editor is open (checks live re-theming), and ROMMUSER_THEME_EDITOR=1 opens the
+// theme editor before the snapshot.
 
 #include <juce_audio_utils/juce_audio_utils.h>
+
+#include "ui/ScalableEditor.h"
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 
@@ -87,6 +93,20 @@ private:
         while (samplesDone < (int64_t) (elapsed * sampleRate / 1000.0))
             processBlock();
 
+        if (! switched && elapsed >= (juce::uint32) warmUpMs / 2)
+        {
+            switched = true;
+            const auto name = juce::SystemStats::getEnvironmentVariable ("ROMMUSER_SWITCH_THEME", {});
+            juce::SharedResourcePointer<rommuser::ui::ThemeManager> themes;
+            for (const auto& t : themes->allThemes())
+                if (name.isNotEmpty() && t.name == name)
+                    themes->preview (t);
+
+            if (juce::SystemStats::getEnvironmentVariable ("ROMMUSER_THEME_EDITOR", {}) == "1")
+                if (auto* scalable = dynamic_cast<rommuser::ui::ScalableEditor*> (editor.get()))
+                    scalable->showThemeEditor();
+        }
+
         if (elapsed >= (juce::uint32) warmUpMs)
         {
             stopTimer();
@@ -146,7 +166,7 @@ private:
     juce::AudioBuffer<float> buffer;
     juce::File output;
     float scale = 1.0f;
-    bool isInstrument = false, ok = false;
+    bool isInstrument = false, ok = false, switched = false;
     int64_t samplesDone = 0;
     juce::uint32 startMs = 0;
 };

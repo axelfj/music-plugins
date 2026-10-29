@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -34,7 +35,7 @@ private:
     float m = -120.0f, s = -120.0f, i = -120.0f, target = -9.0f;
 };
 
-class PeakReadyEditor : public juce::AudioProcessorEditor, private juce::Timer
+class PeakReadyEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit PeakReadyEditor (PeakReadyProcessor&);

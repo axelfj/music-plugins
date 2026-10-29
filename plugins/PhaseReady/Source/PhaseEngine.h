@@ -51,6 +51,7 @@ struct PhaseMeters
 inline constexpr int minStages = 4, maxStages = 12;
 inline constexpr float sweepOctaves = 2.5f;
 inline constexpr float stageSpacingOctaves = 0.25f; // stages fan out around the centre
+inline constexpr float stageStepRatio = 1.18920712f;  // 2^stageSpacingOctaves
 
 // First-order all-pass: y = a*x + x1 - a*y1, 90 degrees at its break frequency.
 struct AllPass1
@@ -66,11 +67,16 @@ struct AllPass1
     }
 };
 
+// a = (tan (pi f / fs) - 1) / (tan (pi f / fs) + 1), which is tan (pi f / fs - pi / 4). With f clamped
+// to [20 Hz, 0.45 fs] the argument stays inside [-pi/4, pi/5], where the [5/4] Padé approximant of
+// tan is within 1.4e-8 of the exact value (below float precision) and needs no library call.
+// The phaser evaluates this for every stage on every sample, so it was most of the plugin's CPU.
 inline float allPassCoefficient (float freqHz, double sampleRate)
 {
     const float f = std::clamp (freqHz, 20.0f, (float) (sampleRate * 0.45));
-    const float t = std::tan ((float) (3.14159265358979323846 * f / sampleRate));
-    return (t - 1.0f) / (t + 1.0f);
+    const float x = 3.14159265f * f / (float) sampleRate - 0.785398163f;
+    const float x2 = x * x;
+    return x * (945.0f - 105.0f * x2 + x2 * x2) / (945.0f - 420.0f * x2 + 15.0f * x2 * x2);
 }
 
 // Smooth random: a new target each LFO cycle, cubic Hermite between them. Holds five values so
@@ -222,11 +228,13 @@ public:
                 const float fLog = centerLog + lfo * depth * sweepOctaves;
                 auto& st = stages[(size_t) ch];
                 const int nStages = std::max (currentStages, targetStages);
+                // Stages fan out: k-th stage sits (k - (N-1)/2) * spacing octaves from the sweep centre,
+                // so the frequencies form a geometric series: one exp2 per sample instead of one per stage.
+                float freq = std::exp2 (fLog - (float) (targetStages - 1) * 0.5f * stageSpacingOctaves);
                 for (int k = 0; k < nStages; ++k)
                 {
-                    // Stages fan out: k-th stage sits (k - (N-1)/2) * spacing octaves from the sweep centre.
-                    const float offset = ((float) k - (float) (targetStages - 1) * 0.5f) * stageSpacingOctaves;
-                    st[(size_t) k].a = allPassCoefficient (std::exp2 (fLog + offset), sampleRate);
+                    st[(size_t) k].a = allPassCoefficient (freq, sampleRate);
+                    freq *= stageStepRatio;
                 }
 
                 const float dry = io[ch][i];

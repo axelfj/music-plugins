@@ -40,7 +40,9 @@ Cada nombre dice qué hace el plugin, y la **R** es de ROMMUSER. *Each name says
 | **Arpeggiator-R** | Arp Ready | Arpegiador MIDI (instrumento): 7 modos (incl. acorde y aleatorio), 15 velocidades con puntillo/tresillo, 1-4 octavas, gate, swing, patrón de 16 pasos, latch, acento, sincronizado a la rejilla del DAW, sonido interno y 10 presets | Alpha |
 | **Pitch-R** | — | Cambiador de tono limpio para cualquier cosa (mezclas, acordes, voces, bajos, drums): ±24 st y cents, sin tonos fantasma ni pre-eco, conservar formantes o moverlos, modos Limpio / Voz / Rápido, A/B con el original | Alpha |
 
-El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
+La siguiente generación está descrita en [V2 y V3](docs/V2_V3_ROADMAP.md). V2 está en desarrollo; los releases actuales siguen siendo alpha.
+
+El plan original está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 
 ## Vista previa
 
@@ -107,6 +109,12 @@ Así se ven por dentro antes de instalarlos. Son capturas reales de cada plugin 
 </tr>
 </table>
 
+## Tamaño y temas
+
+Cada plugin se puede agrandar o achicar arrastrando la esquina de abajo a la derecha, o desde el botón de los tres puntos de colores arriba a la derecha (75 % a 250 %). Toda la interfaz se dibuja como vectores, así que se ve igual de nítida en una laptop o en una pantalla 4K.
+
+En ese mismo botón eliges el tema (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) o creas uno propio: clic en cada color, lo ves cambiar en vivo y lo guardas con un nombre. Cada plugin recuerda su tamaño y su tema. Los temas son archivos `.json` pequeños en `Documentos/ROMMUSER/Themes/`, fáciles de compartir; ver [docs/THEMES.md](docs/THEMES.md).
+
 ## Instalar
 
 Descarga la última versión desde [Releases](https://github.com/axelfj/music-plugins/releases). Cada archivo lleva el nombre del plugin, por ejemplo `EQ-R-Setup-1.0.0-alpha.2.exe`.
@@ -137,7 +145,7 @@ Si cambias una interfaz, vuelve a generar las capturas de la vista previa con `t
 
 ```
 shared/dsp/      DSP común, C++ puro sin JUCE (sobremuestreo, suavizado, cambio de tono espectral), probado en tests/
-shared/ui/       Look & feel común y textos bilingües
+shared/ui/       Look & feel, temas, zoom vectorial (ScalableEditor) y textos bilingües
 plugins/<Name>/  Un plugin por carpeta: VERSION, CHANGELOG.md, Source/
 tests/           Pruebas de DSP (Catch2): respuesta, aliasing, latencia, nulos
 installer/       Inno Setup (Windows) y pkgbuild (macOS)
@@ -157,3 +165,4 @@ Cada plugin se versiona por separado: `plugins/<Name>/VERSION` guarda la versió
 ## Contribuir
 
 Issues y pull requests son bienvenidos. Antes de proponer un plugin nuevo revisa el [roadmap](https://github.com/axelfj/music-plugins/issues/1). Nunca copiamos nombres, logos ni diseño visual de plugins comerciales.
+

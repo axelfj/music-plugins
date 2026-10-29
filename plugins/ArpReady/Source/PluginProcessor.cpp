@@ -306,7 +306,7 @@ void ArpReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 //==============================================================================
 juce::AudioProcessorEditor* ArpReadyProcessor::createEditor()
 {
-    return new ArpReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<ArpReadyEditor> (*this);
 }
 
 void ArpReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

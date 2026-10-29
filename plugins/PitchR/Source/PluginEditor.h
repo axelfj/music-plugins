@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -23,7 +24,7 @@ private:
     rommuser::pitchr::SpectrumAnalyzer inAnalyzer, outAnalyzer;
 };
 
-class PitchREditor : public juce::AudioProcessorEditor, private juce::Timer
+class PitchREditor : public juce::Component, private juce::Timer
 {
 public:
     explicit PitchREditor (PitchRProcessor&);

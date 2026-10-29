@@ -128,7 +128,7 @@ void PitchRProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Midi
 
 juce::AudioProcessorEditor* PitchRProcessor::createEditor()
 {
-    return new PitchREditor (*this);
+    return rommuser::ui::createScalableEditor<PitchREditor> (*this);
 }
 
 void PitchRProcessor::getStateInformation (juce::MemoryBlock& destData)

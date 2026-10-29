@@ -138,8 +138,8 @@ public:
         // Coefficient ramps: ~ 5 ms, in blocks of `rampBlock` samples to keep the cost down.
         rampBlock = 32;
         rampSteps = std::max (1, (int) std::lround (sampleRate * 0.005 / rampBlock));
-        mid.assign ((size_t) maxBlockSize, 0.0f);
-        side.assign ((size_t) maxBlockSize, 0.0f);
+        mid.assign ((size_t) std::max (rampBlock, maxBlockSize), 0.0f);
+        side.assign ((size_t) std::max (rampBlock, maxBlockSize), 0.0f);
         outGain.prepare (sampleRate, 0.02);
         setParams (params, true);
         reset();
@@ -147,6 +147,7 @@ public:
 
     void reset()
     {
+        rampPosition = 0;
         for (auto& ch : filters)
             for (auto& band : ch)
                 for (auto& s : band)
@@ -159,14 +160,16 @@ public:
         for (int b = 0; b < maxBands; ++b)
         {
             const auto& bp = p.bands[(size_t) b];
-            target[(size_t) b] = bp.enabled ? designBand (bp, sampleRate) : BandCoeffs {};
+            const auto nextTarget = bp.enabled ? designBand (bp, sampleRate) : BandCoeffs {};
+            const bool changed = ! sameCoeffs (target[(size_t) b], nextTarget);
+            target[(size_t) b] = nextTarget;
             placement[(size_t) b] = bp.placement;
             if (immediate)
             {
                 current[(size_t) b] = target[(size_t) b];
                 rampRemaining[(size_t) b] = 0;
             }
-            else if (! sameCoeffs (current[(size_t) b], target[(size_t) b]))
+            else if (changed)
             {
                 // Section count changes (type/slope switches) can't be interpolated: jump.
                 if (current[(size_t) b].numSections != target[(size_t) b].numSections)
@@ -220,8 +223,9 @@ public:
         int offset = 0;
         while (offset < n)
         {
-            const int len = std::min (rampBlock, n - offset);
-            advanceRamps();
+            const int len = std::min (rampBlock - rampPosition, n - offset);
+            if (rampPosition == 0)
+                advanceRamps();
 
             if (stereo && usesMidSide())
             {
@@ -263,6 +267,7 @@ public:
                     io[c][offset + i] *= g;
             }
             offset += len;
+            rampPosition = (rampPosition + len) % rampBlock;
         }
     }
 
@@ -345,7 +350,7 @@ private:
 
     EqParams params;
     double sampleRate = 44100.0;
-    int channels = 2, rampBlock = 32, rampSteps = 1;
+    int channels = 2, rampBlock = 32, rampSteps = 1, rampPosition = 0;
     std::array<BandCoeffs, maxBands> current {}, target {}, rampStart {};
     std::array<int, maxBands> rampRemaining {};
     std::array<Placement, maxBands> placement {};
@@ -355,3 +360,4 @@ private:
 };
 
 } // namespace rommuser::shapeeq
+
