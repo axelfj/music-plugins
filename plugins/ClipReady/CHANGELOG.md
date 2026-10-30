@@ -1,7 +1,8 @@
 # Clipper-R (antes Clip Ready)
 
-## Próxima versión / Next
+## 1.0.0-alpha.5
 
+- Techo estricto más limpio: antes recortaba de golpe los pequeños picos que deja el filtro del sobremuestreo, y ese recorte devolvía el aliasing que el sobremuestreo había quitado (−30 dBc a 2x, 4x u 8x en un tono de 7 kHz empujado 12 dB). Ahora una rampa de ganancia de 1 ms baja solo esos picos: 4x mide −50 dBc y 4x HQ −75 dBc, con el pico igual de exacto en el techo. Suma 1 ms de latencia con el techo estricto, que se reporta al DAW. / Cleaner strict ceiling: the clamp after downsampling put the aliasing back (−30 dBc at any factor); a 1 ms lookahead gain ramp now trims the filter overshoot instead (4x −50 dBc, 4x HQ −75 dBc, same exact peak). Adds 1 ms of latency with the strict ceiling, reported to the host.
 - Ventana con zoom vectorial: arrastra la esquina o usa el botón de colores (arriba a la derecha) para elegir de 75 % a 250 %; texto, perillas y curvas se ven igual de nítidos a cualquier tamaño. / Vector zoom: drag the corner or use the colour-dots button (top right) for 75 % to 250 %; text, knobs and curves stay sharp at any size.
 - Temas: 7 incluidos (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) y editor para crear los tuyos, solo para este plugin o para todos. El plugin recuerda su tamaño y su tema. / Themes: 7 built in plus an editor to make your own, for this plugin only or for all. The plugin remembers its size and theme.
 - Esquina superior derecha: "R - V1 - FREE". / Top-right corner: "R - V1 - FREE".

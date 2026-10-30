@@ -127,15 +127,20 @@ public:
 
         const float attackMs = std::max (0.0f, p.attackMs * profile.attackScale);
         const float releaseMs = std::max (1.0f, p.releaseMs * profile.releaseScale);
-        attackCoef = coefFor (attackMs);
-        releaseCoef = coefFor (releaseMs);
-        releaseFastCoef = coefFor (std::max (20.0f, releaseMs / 5.0f));
-        releaseSlowCoef = coefFor (releaseMs * 3.0f);
         kneeDb = std::clamp (p.kneeDb + profile.kneeAddDb, 0.0f, 30.0f);
         detector = profile.forcePeak ? Detector::peak : profile.forceRms ? Detector::rms : p.detector;
         rmsCoef = coefFor (detector == Detector::rms && p.character == Character::glue ? 30.0f : 10.0f);
-        holdSamples = (int) std::lround (sampleRate * peakHoldMs / 1000.0);
-        peakDecayCoef = coefFor (peakHoldMs);
+        // The peak hold bridges the dips between the peaks of a waveform. Up to 10 ms (half a period
+        // of 50 Hz) so a fast release does not ride a bass note (2 ms gave -34 dB THD at 50 Hz with a
+        // 30 ms release, 10 ms gives -113 dB), never more than a third of the release; the release
+        // time constant gives the hold back so the knob still means what it says.
+        const float holdMs = detector == Detector::peak ? std::clamp (releaseMs / 3.0f, peakDecayMs, maxPeakHoldMs) : 0.0f;
+        attackCoef = coefFor (attackMs);
+        releaseCoef = coefFor (releaseMs - holdMs);
+        releaseFastCoef = coefFor (std::max (20.0f, releaseMs / 5.0f) - holdMs);
+        releaseSlowCoef = coefFor (releaseMs * 3.0f - holdMs);
+        holdSamples = (int) std::lround (sampleRate * holdMs / 1000.0);
+        peakDecayCoef = coefFor (peakDecayMs);
 
         lookaheadSamples = std::clamp ((int) std::lround (sampleRate * p.lookaheadMs / 1000.0), 0,
                                        (int) std::ceil (sampleRate * maxLookaheadMs / 1000.0));
@@ -259,7 +264,7 @@ private:
     int channels = 2, lookaheadSamples = 0;
     float attackCoef = 1.0f, releaseCoef = 1.0f, releaseFastCoef = 1.0f, releaseSlowCoef = 1.0f, rmsCoef = 1.0f, kneeDb = 6.0f;
     Detector detector = Detector::peak;
-    static constexpr float peakHoldMs = 2.0f;
+    static constexpr float peakDecayMs = 2.0f, maxPeakHoldMs = 10.0f;
     int holdSamples = 0, holdLeft = 0;
     float peakDecayCoef = 1.0f;
     float gr = 0.0f, grFast = 0.0f, grSlow = 0.0f, rmsState = 0.0f, peakLevel = 0.0f;

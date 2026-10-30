@@ -36,11 +36,11 @@ ya probada en un prototipo / The weak spots in this run, each with a fix already
   caían en muestras enteras: −8 dB de ruido en un diente de sierra de 220 Hz subido una quinta. Ya
   corregido en esta corrida (−36 dB). / PSOLA grains read the fractional offset with the wrong sign and
   marks sat on whole samples (−8 dB); fixed in this run (−36 dB).
-- Clipper-R: el techo estricto recorta a la frecuencia base y deshace el sobremuestreo (−30 dBc a
-  cualquier factor; un limitador corto en su lugar: −75 dBc a 4x HQ, mismo pico). / The strict
-  ceiling clamps at the base rate and undoes oversampling; a short limiter instead keeps −75 dBc.
-- Compressor-R: hold de 2 ms en el detector de picos: −34 dB de THD a 50 Hz con release de 30 ms
-  (10 ms: −113 dB). / 2 ms peak hold distorts bass with fast release (10 ms: −113 dB).
+- Clipper-R: el techo estricto recortaba a la frecuencia base y deshacía el sobremuestreo (−30 dBc a
+  cualquier factor). Ya corregido con una rampa de 1 ms: −75 dBc a 4x HQ, mismo pico. / The strict
+  ceiling clamped at the base rate; fixed with a 1 ms gain ramp (−75 dBc at 4x HQ, same peak).
+- Compressor-R: el hold de 2 ms del detector de picos daba −34 dB de THD a 50 Hz con release de
+  30 ms. Ya corregido (hasta 10 ms): −113 dB. / The 2 ms peak hold distorted bass; fixed (−113 dB).
 - Reverb-R: plate coloreado (28 dB de variación sin modulación) y hall que no se vuelve difuso en
   500 ms (FDN de 16 líneas con all-pass en el lazo: 6,9 dB y 78 ms). / Coloured plate, slow-to-diffuse
   hall (16-line FDN with in-loop all-passes: 6.9 dB, 78 ms).
@@ -51,10 +51,11 @@ ya probada en un prototipo / The weak spots in this run, each with a fix already
 
 ```
 group        setup                                metric                         value
-saturation   Clipper-R hard 4x strict             alias, 7 kHz +12 dB            -30.5 dBc  
-saturation   Clipper-R hard 2x HQ strict          alias, 7 kHz +12 dB            -27.1 dBc  
-saturation   Clipper-R hard 8x strict             alias, 7 kHz +12 dB            -30.5 dBc  
-saturation   Clipper-R soft 4x strict             alias, 7 kHz +12 dB            -32.2 dBc  
+saturation   Clipper-R hard 4x strict             alias, 7 kHz +12 dB            -50.1 dBc  
+saturation   Clipper-R hard 2x HQ strict          alias, 7 kHz +12 dB            -51.8 dBc  
+saturation   Clipper-R hard 4x HQ strict          alias, 7 kHz +12 dB            -75.1 dBc  
+saturation   Clipper-R hard 8x strict             alias, 7 kHz +12 dB            -61.7 dBc  
+saturation   Clipper-R soft 4x strict             alias, 7 kHz +12 dB            -64.9 dBc  
 saturation   Clipper-R hard 2x                    alias, 7 kHz +12 dB            -36.5 dBc  
 saturation   Clipper-R hard 4x                    alias, 7 kHz +12 dB            -50.1 dBc  
 saturation   Clipper-R hard 2x HQ                 alias, 7 kHz +12 dB            -51.8 dBc  
@@ -65,8 +66,8 @@ saturation   Saturator-R tape 2x HQ               alias, 7 kHz drive 18         
 saturation   Saturator-R tube 2x                  alias, 7 kHz drive 18          -40.6 dBc  
 saturation   Saturator-R rectify 4x               alias, 7 kHz drive 18          -47.9 dBc  
 saturation   Saturator-R transistor 1x            alias, 7 kHz drive 18          -16.2 dBc  
-dynamics     Compressor-R peak 1/30 ms            THD, 50 Hz -6 dBFS             -34.1 dB   release ripple distorts bass
-dynamics     Compressor-R rms 1/30 ms             THD, 50 Hz -6 dBFS             -46.7 dB   release ripple distorts bass
+dynamics     Compressor-R peak 1/30 ms            THD, 50 Hz -6 dBFS            -112.9 dB   peak vs rms detector
+dynamics     Compressor-R rms 1/30 ms             THD, 50 Hz -6 dBFS             -46.7 dB   peak vs rms detector
 dynamics     Compressor-R punch                   alias, 7 kHz -6 dBFS           -92.5 dBc  saturation at 1x
 dynamics     Compressor-R glue                    alias, 7 kHz -6 dBFS           -96.0 dBc  saturation at 1x
 dynamics     Multiband-R depth 100 %              THD, 50 Hz -12 dBFS            -66.0 dB   

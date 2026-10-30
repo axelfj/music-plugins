@@ -21,6 +21,7 @@
 #include "../../../shared/dsp/FractionalDelay.h"
 #include "../../../shared/dsp/Loudness.h"
 #include "../../../shared/dsp/Oversampler.h"
+#include "../../../shared/dsp/PeakGuard.h"
 #include "../../../shared/dsp/Smoothing.h"
 #include "../../ClipReady/Source/ClipEngine.h"
 
@@ -59,53 +60,7 @@ inline constexpr float maxLookaheadMs = 5.0f;
 
 inline float lookaheadMsFor (Style s) { return s == Style::transparent ? 4.0f : s == Style::punchy ? 1.5f : 0.5f; }
 
-// Sliding minimum over a fixed window using a monotonic queue (O(1) amortised per sample).
-class SlidingMin
-{
-public:
-    void prepare (int windowLength)
-    {
-        window = std::max (1, windowLength);
-        values.assign ((size_t) window + 1, 1.0f);
-        indices.assign ((size_t) window + 1, 0);
-        reset();
-    }
-
-    void reset()
-    {
-        front = back = 0;
-        count = 0;
-        n = 0;
-    }
-
-    inline float push (float v)
-    {
-        // Drop larger values from the back: they can never be the minimum while v is in the window.
-        while (count > 0 && values[(size_t) ((back + (int) values.size() - 1) % (int) values.size())] >= v)
-        {
-            back = (back + (int) values.size() - 1) % (int) values.size();
-            --count;
-        }
-        values[(size_t) back] = v;
-        indices[(size_t) back] = n;
-        back = (back + 1) % (int) values.size();
-        ++count;
-        // Drop the front once it leaves the window.
-        if (indices[(size_t) front] <= n - window)
-        {
-            front = (front + 1) % (int) values.size();
-            --count;
-        }
-        ++n;
-        return values[(size_t) front];
-    }
-
-private:
-    std::vector<float> values;
-    std::vector<long long> indices;
-    int window = 1, front = 0, back = 0, count = 0;
-    long long n = 0;
-};
+using dsp::SlidingMin; // shared/dsp/PeakGuard.h
 
 class PeakEngine
 {
