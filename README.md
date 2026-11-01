@@ -109,6 +109,12 @@ Así se ven por dentro antes de instalarlos. Son capturas reales de cada plugin 
 </tr>
 </table>
 
+## Manuales
+
+Cada plugin tiene su manual en español e inglés, escrito para que lo entienda alguien que está empezando: qué hace, cómo usarlo en un minuto, qué hace cada control, recetas y tips. Empieza por [Primeros pasos](docs/manuals/primeros-pasos.md) (instalar, cargar en FL Studio o Ableton, sidechain, MIDI) y luego abre el [manual de tu plugin](docs/manuals/README.md).
+
+*Every plugin has a beginner-friendly manual in Spanish and English: what it does, a one-minute start, every control, recipes and tips. Start with [Getting started](docs/manuals/primeros-pasos.md), then open your [plugin's manual](docs/manuals/README.md).*
+
 ## Tamaño y temas
 
 Cada plugin se puede agrandar o achicar arrastrando la esquina de abajo a la derecha, o desde el botón de los tres puntos de colores arriba a la derecha (75 % a 250 %). Toda la interfaz se dibuja como vectores, así que se ve igual de nítida en una laptop o en una pantalla 4K.
