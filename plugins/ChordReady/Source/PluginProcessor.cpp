@@ -311,7 +311,7 @@ void ChordReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 //==============================================================================
 juce::AudioProcessorEditor* ChordReadyProcessor::createEditor()
 {
-    return new ChordReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<ChordReadyEditor> (*this);
 }
 
 void ChordReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

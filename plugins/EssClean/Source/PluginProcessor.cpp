@@ -187,7 +187,7 @@ void EssCleanProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 
 juce::AudioProcessorEditor* EssCleanProcessor::createEditor()
 {
-    return new EssCleanEditor (*this);
+    return rommuser::ui::createScalableEditor<EssCleanEditor> (*this);
 }
 
 void EssCleanProcessor::getStateInformation (juce::MemoryBlock& destData)

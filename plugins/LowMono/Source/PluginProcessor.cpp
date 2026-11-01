@@ -119,7 +119,7 @@ void LowMonoProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
 
 juce::AudioProcessorEditor* LowMonoProcessor::createEditor()
 {
-    return new LowMonoEditor (*this);
+    return rommuser::ui::createScalableEditor<LowMonoEditor> (*this);
 }
 
 void LowMonoProcessor::getStateInformation (juce::MemoryBlock& destData)

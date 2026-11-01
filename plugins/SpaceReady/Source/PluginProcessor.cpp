@@ -169,7 +169,7 @@ void SpaceReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 
 juce::AudioProcessorEditor* SpaceReadyProcessor::createEditor()
 {
-    return new SpaceReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<SpaceReadyEditor> (*this);
 }
 
 void SpaceReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

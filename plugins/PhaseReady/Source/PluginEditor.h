@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -24,7 +25,7 @@ private:
     float lfoL = 0.0f, lfoR = 0.0f;
 };
 
-class PhaseReadyEditor : public juce::AudioProcessorEditor, private juce::Timer
+class PhaseReadyEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit PhaseReadyEditor (PhaseReadyProcessor&);

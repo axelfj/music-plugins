@@ -1,44 +1,29 @@
 // Shared look for every ROMMUSER plugin: dark background, one accent colour, big readable knobs.
-// Also holds the tiny bilingual text helper (Spanish when the OS language is Spanish, else English).
+// Colours come from the current theme (Theme.h), which also holds the tiny bilingual text helper.
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
+
+#include "Theme.h"
 
 #include <juce_gui_basics/juce_gui_basics.h>
 
 namespace rommuser::ui
 {
 
-namespace colours
-{
-    inline const juce::Colour background { 0xff15161a };
-    inline const juce::Colour panel      { 0xff1f2127 };
-    inline const juce::Colour outline    { 0xff2e3139 };
-    inline const juce::Colour text       { 0xffe8e9ee };
-    inline const juce::Colour textDim    { 0xff8a8f9c };
-    inline const juce::Colour accent     { 0xfff2a23a }; // warm orange
-    inline const juce::Colour good       { 0xff58c98b };
-    inline const juce::Colour warn       { 0xffe5534b };
-}
-
-inline bool isSpanish()
-{
-    static const bool spanish = juce::SystemStats::getUserLanguage().startsWithIgnoreCase ("es")
-                             || juce::SystemStats::getDisplayLanguage().startsWithIgnoreCase ("es");
-    return spanish;
-}
-
-// tr ("Entrada", "Input")
-inline juce::String tr (const char* spanish, const char* english)
-{
-    return juce::String::fromUTF8 (isSpanish() ? spanish : english);
-}
-
 class LookAndFeel : public juce::LookAndFeel_V4
 {
 public:
-    LookAndFeel()
+    LookAndFeel() { applyTheme(); }
+
+    // Re-reads the theme colours; called again whenever the theme changes.
+    void applyTheme()
     {
+        // The V4 scheme colours popups, scrollbars and dialogs; the ids below then override it.
+        setColourScheme ({ colours::background, colours::panel, colours::panel,
+                           colours::outline, colours::text, colours::panel,
+                           colours::text, colours::accent, colours::text });
+
         setColour (juce::ResizableWindow::backgroundColourId, colours::background);
         setColour (juce::Slider::textBoxTextColourId, colours::text);
         setColour (juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
@@ -58,6 +43,20 @@ public:
         setColour (juce::TooltipWindow::backgroundColourId, colours::panel.brighter (0.1f));
         setColour (juce::TooltipWindow::textColourId, colours::text);
         setColour (juce::TooltipWindow::outlineColourId, colours::outline);
+        setColour (juce::PopupMenu::textColourId, colours::text);
+        setColour (juce::PopupMenu::highlightedTextColourId, colours::text);
+        setColour (juce::PopupMenu::headerTextColourId, colours::textDim);
+        setColour (juce::TextEditor::backgroundColourId, colours::background);
+        setColour (juce::TextEditor::textColourId, colours::text);
+        setColour (juce::TextEditor::outlineColourId, colours::outline);
+        setColour (juce::TextEditor::focusedOutlineColourId, colours::accent);
+        setColour (juce::TextEditor::highlightColourId, colours::accent.withAlpha (0.35f));
+        setColour (juce::CaretComponent::caretColourId, colours::text);
+        setColour (juce::ToggleButton::textColourId, colours::text);
+        setColour (juce::ToggleButton::tickColourId, colours::accent);
+        setColour (juce::ToggleButton::tickDisabledColourId, colours::textDim);
+        setColour (juce::ColourSelector::backgroundColourId, colours::panel);
+        setColour (juce::ColourSelector::labelTextColourId, colours::textDim);
     }
 
     void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, float pos,
@@ -134,5 +133,29 @@ public:
     juce::Slider slider;
     juce::Label label;
 };
+
+// Space kept free at the right end of the header for the size / theme menu (ScalableEditor.h).
+constexpr int headerMenuWidth = 34;
+
+// The header every plugin shares: name on the left, "R - V1 - FREE" on the right, a rule below.
+// `s` is the editor's scale against its base size (1 since editors are laid out at base size).
+inline void drawHeader (juce::Graphics& g, juce::Rectangle<int> area, float s)
+{
+    const int width = area.getWidth();
+    auto header = area.reduced (juce::roundToInt (20 * s), 0);
+
+    g.setColour (colours::text);
+    g.setFont (juce::FontOptions (24.0f * s, juce::Font::bold));
+    g.drawText (juce::String (JucePlugin_Name).toUpperCase(), header, juce::Justification::centredLeft);
+
+    header.removeFromRight (juce::roundToInt (headerMenuWidth * s));
+    g.setColour (colours::textDim);
+    g.setFont (juce::FontOptions (12.0f * s));
+    g.drawText ("R - V" + juce::String (PLUGIN_VERSION_STRING).upToFirstOccurrenceOf (".", false, false) + " - FREE",
+                header, juce::Justification::centredRight);
+
+    g.setColour (colours::outline);
+    g.drawHorizontalLine (header.getBottom(), (float) area.getX(), (float) (area.getX() + width));
+}
 
 } // namespace rommuser::ui

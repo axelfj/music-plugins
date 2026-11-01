@@ -202,7 +202,7 @@ void FilterReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 
 juce::AudioProcessorEditor* FilterReadyProcessor::createEditor()
 {
-    return new FilterReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<FilterReadyEditor> (*this);
 }
 
 void FilterReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

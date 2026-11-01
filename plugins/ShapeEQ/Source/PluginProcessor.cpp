@@ -149,7 +149,7 @@ void ShapeEQProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
 
 juce::AudioProcessorEditor* ShapeEQProcessor::createEditor()
 {
-    return new ShapeEQEditor (*this);
+    return rommuser::ui::createScalableEditor<ShapeEQEditor> (*this);
 }
 
 void ShapeEQProcessor::getStateInformation (juce::MemoryBlock& destData)

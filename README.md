@@ -38,8 +38,11 @@ Cada nombre dice qué hace el plugin, y la **R** es de ROMMUSER. *Each name says
 | **Synth-R** | Wave Ready | Sintetizador wavetable (instrumento MIDI): 2 osciladores con morph y unísono hasta 7 voces, sub, ruido, filtro SVF 12/24 dB, 2 envolventes, 2 LFOs sincronizados, mono/legato/glide, chorus, delay ping-pong, reverb y 13 presets | Alpha |
 | **Chord-R** | Chord Ready | Herramienta MIDI (instrumento): una tecla = un acorde completo. Por escala (tonalidad + 10 escalas, 7ª/9ª, snap) o 20 tipos fijos, 4 voicings, inversiones, octavas, strum con dirección, suavizado y humanize, sonido interno para oírlo al instante y 10 presets | Alpha |
 | **Arpeggiator-R** | Arp Ready | Arpegiador MIDI (instrumento): 7 modos (incl. acorde y aleatorio), 15 velocidades con puntillo/tresillo, 1-4 octavas, gate, swing, patrón de 16 pasos, latch, acento, sincronizado a la rejilla del DAW, sonido interno y 10 presets | Alpha |
+| **Pitch-R** | — | Cambiador de tono limpio para cualquier cosa (mezclas, acordes, voces, bajos, drums): ±24 st y cents, sin tonos fantasma ni pre-eco, conservar formantes o moverlos, modos Limpio / Voz / Rápido, A/B con el original | Alpha |
 
-El plan completo está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
+La siguiente generación está descrita en [V2 y V3](docs/V2_V3_ROADMAP.md). V2 está en desarrollo; los releases actuales siguen siendo alpha.
+
+El plan original está en el [roadmap](https://github.com/axelfj/music-plugins/issues/1).
 
 ## Vista previa
 
@@ -100,6 +103,10 @@ Así se ven por dentro antes de instalarlos. Son capturas reales de cada plugin 
 <td width="50%" align="center"><a href="docs/screenshots/chord-ready.png"><img src="docs/screenshots/chord-ready.png" alt="Chord-R"></a><br><b>Chord-R</b> · Acordes MIDI</td>
 <td width="50%" align="center"><a href="docs/screenshots/arp-ready.png"><img src="docs/screenshots/arp-ready.png" alt="Arpeggiator-R"></a><br><b>Arpeggiator-R</b> · Arpegiador MIDI</td>
 </tr>
+<tr>
+<td width="50%" align="center"><a href="docs/screenshots/pitch-r.png"><img src="docs/screenshots/pitch-r.png" alt="Pitch-R"></a><br><b>Pitch-R</b> · Cambio de tono</td>
+<td width="50%"></td>
+</tr>
 </table>
 
 ## Manuales
@@ -107,6 +114,12 @@ Así se ven por dentro antes de instalarlos. Son capturas reales de cada plugin 
 Cada plugin tiene su manual en español e inglés, escrito para que lo entienda alguien que está empezando: qué hace, cómo usarlo en un minuto, qué hace cada control, recetas y tips. Empieza por [Primeros pasos](docs/manuals/primeros-pasos.md) (instalar, cargar en FL Studio o Ableton, sidechain, MIDI) y luego abre el [manual de tu plugin](docs/manuals/README.md).
 
 *Every plugin has a beginner-friendly manual in Spanish and English: what it does, a one-minute start, every control, recipes and tips. Start with [Getting started](docs/manuals/primeros-pasos.md), then open your [plugin's manual](docs/manuals/README.md).*
+
+## Tamaño y temas
+
+Cada plugin se puede agrandar o achicar arrastrando la esquina de abajo a la derecha, o desde el botón de los tres puntos de colores arriba a la derecha (75 % a 250 %). Toda la interfaz se dibuja como vectores, así que se ve igual de nítida en una laptop o en una pantalla 4K.
+
+En ese mismo botón eliges el tema (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) o creas uno propio: clic en cada color, lo ves cambiar en vivo y lo guardas con un nombre. Cada plugin recuerda su tamaño y su tema. Los temas son archivos `.json` pequeños en `Documentos/ROMMUSER/Themes/`, fáciles de compartir; ver [docs/THEMES.md](docs/THEMES.md).
 
 ## Instalar
 
@@ -137,8 +150,8 @@ Si cambias una interfaz, vuelve a generar las capturas de la vista previa con `t
 ## Estructura
 
 ```
-shared/dsp/      DSP común, C++ puro sin JUCE (sobremuestreo, suavizado), probado en tests/
-shared/ui/       Look & feel común y textos bilingües
+shared/dsp/      DSP común, C++ puro sin JUCE (sobremuestreo, suavizado, cambio de tono espectral), probado en tests/
+shared/ui/       Look & feel, temas, zoom vectorial (ScalableEditor) y textos bilingües
 plugins/<Name>/  Un plugin por carpeta: VERSION, CHANGELOG.md, Source/
 tests/           Pruebas de DSP (Catch2): respuesta, aliasing, latencia, nulos
 installer/       Inno Setup (Windows) y pkgbuild (macOS)
@@ -158,3 +171,4 @@ Cada plugin se versiona por separado: `plugins/<Name>/VERSION` guarda la versió
 ## Contribuir
 
 Issues y pull requests son bienvenidos. Antes de proponer un plugin nuevo revisa el [roadmap](https://github.com/axelfj/music-plugins/issues/1). Nunca copiamos nombres, logos ni diseño visual de plugins comerciales.
+

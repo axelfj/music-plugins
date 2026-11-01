@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -54,7 +55,7 @@ private:
     float valueDb = 0.0f;
 };
 
-class ClipReadyEditor : public juce::AudioProcessorEditor, private juce::Timer
+class ClipReadyEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit ClipReadyEditor (ClipReadyProcessor&);
@@ -72,7 +73,7 @@ private:
 
     rommuser::ui::Knob input, ceiling, softness, output, mix;
     juce::ComboBox oversampling;
-    juce::TextButton link, delta, strict;
+    juce::TextButton link, delta, strict, hq;
     juce::Label oversamplingLabel;
 
     TransferCurve curve;

@@ -1,5 +1,16 @@
 # Saturator-R (antes Warm Drive)
 
+## Próxima versión / Next
+
+- Ventana con zoom vectorial: arrastra la esquina o usa el botón de colores (arriba a la derecha) para elegir de 75 % a 250 %; texto, perillas y curvas se ven igual de nítidos a cualquier tamaño. / Vector zoom: drag the corner or use the colour-dots button (top right) for 75 % to 250 %; text, knobs and curves stay sharp at any size.
+- Temas: 7 incluidos (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) y editor para crear los tuyos, solo para este plugin o para todos. El plugin recuerda su tamaño y su tema. / Themes: 7 built in plus an editor to make your own, for this plugin only or for all. The plugin remembers its size and theme.
+- Esquina superior derecha: "R - V1 - FREE". / Top-right corner: "R - V1 - FREE".
+
+## 1.0.0-alpha.3
+
+- Menos CPU: sobremuestreo ~2x más rápido con el mismo filtro (2.8 % → 1.3 % de un núcleo). / Less CPU: ~2x faster oversampling with the same filter.
+- Nuevo botón **HQ**: antialiasing por antiderivada (ADAA) en las cinco curvas (Rectify con cuadratura de Gauss), plano hasta 20 kHz y sin peine al mezclar. Quita 11-18 dB de aliasing con drive alto (Tape a 2x: −68 → −85 dBFS) por ~25 % más de CPU. Suma 2 muestras de latencia a 2x y 1 a 4x, que se reportan al DAW. / New **HQ** button: ADAA on all five curves, flat to 20 kHz and comb-free in the mix; 11-18 dB less aliasing at high drive for ~25 % more CPU. Adds 2 samples of latency at 2x, 1 at 4x, reported to the host.
+
 ## 1.0.0-alpha.2
 
 - Nuevo nombre: **Saturator-R** (antes Warm Drive). El nombre ahora dice qué hace el plugin; la R es de ROMMUSER. / Renamed to **Saturator-R** (formerly Warm Drive): the name now says what the plugin does; the R stands for ROMMUSER.

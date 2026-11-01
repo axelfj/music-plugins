@@ -56,8 +56,7 @@ void CurveView::paint (juce::Graphics& g)
 
 //==============================================================================
 WarmDriveEditor::WarmDriveEditor (WarmDriveProcessor& p)
-    : AudioProcessorEditor (p),
-      processor (p)
+    : processor (p)
 {
     setLookAndFeel (&lnf);
 
@@ -129,6 +128,15 @@ WarmDriveEditor::WarmDriveEditor (WarmDriveProcessor& p)
     addAndMakeVisible (autoGain);
     buttonAttachments.push_back (std::make_unique<ButtonAttachment> (processor.state, ParamIDs::autoGain, autoGain));
 
+    hq.setButtonText ("HQ");
+    hq.setClickingTogglesState (true);
+    hq.setTooltip (tr ("Antialiasing extra (ADAA): mucho menos aliasing con drive alto, a cambio de un poco más de CPU. "
+                       "Con HQ, 2x suena tan limpio como 4x sin HQ.",
+                       "Extra antialiasing (ADAA): far less aliasing at high drive, for a little more CPU. "
+                       "With HQ, 2x is as clean as 4x without it."));
+    addAndMakeVisible (hq);
+    buttonAttachments.push_back (std::make_unique<ButtonAttachment> (processor.state, ParamIDs::hq, hq));
+
     for (int i = 0; i < 3; ++i)
     {
         auto& b = presetButtons[i];
@@ -142,10 +150,7 @@ WarmDriveEditor::WarmDriveEditor (WarmDriveProcessor& p)
     for (auto& col : bands)
         addAndMakeVisible (col.curve);
 
-    setResizable (true, true);
-    setResizeLimits (baseWidth * 3 / 4, baseHeight * 3 / 4, baseWidth * 2, baseHeight * 2);
-    if (auto* c = getConstrainer())
-        c->setFixedAspectRatio ((double) baseWidth / baseHeight);
+    // Laid out at its base size; ScalableEditor zooms it as vectors to any window size.
     setSize (baseWidth, baseHeight);
 
     updateEnablement();
@@ -162,19 +167,7 @@ void WarmDriveEditor::paint (juce::Graphics& g)
     g.fillAll (colours::background);
 
     const float s = (float) getWidth() / baseWidth;
-    auto header = getLocalBounds().removeFromTop (juce::roundToInt (48 * s)).reduced (juce::roundToInt (20 * s), 0);
-
-    g.setColour (colours::text);
-    g.setFont (juce::FontOptions (24.0f * s, juce::Font::bold));
-    g.drawText (juce::String (JucePlugin_Name).toUpperCase(), header, juce::Justification::centredLeft);
-
-    g.setColour (colours::textDim);
-    g.setFont (juce::FontOptions (12.0f * s));
-    g.drawText (juce::String::fromUTF8 ("ROMMUSER  ·  v") + PLUGIN_VERSION_STRING + juce::String::fromUTF8 ("  ·  ") + tr ("gratis y open source", "free & open source"),
-                header, juce::Justification::centredRight);
-
-    g.setColour (colours::outline);
-    g.drawHorizontalLine (header.getBottom(), 0.0f, (float) getWidth());
+    drawHeader (g, getLocalBounds().removeFromTop (juce::roundToInt (48 * s)), s);
 }
 
 void WarmDriveEditor::resized()
@@ -195,6 +188,11 @@ void WarmDriveEditor::resized()
         auto cell = top.removeFromLeft (gw);
         c.second->setBounds (cell.removeFromTop (px (18)));
         c.first->setBounds (cell.removeFromTop (px (30)).reduced (px (6), px (2)));
+        if (c.first == &oversamplingBox)
+        {
+            cell.removeFromTop (px (8));
+            hq.setBounds (cell.removeFromTop (px (28)).reduced (px (6), px (2)));
+        }
     }
     for (auto& k : xover)
         k.setBounds (top.removeFromLeft (gw));

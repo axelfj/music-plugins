@@ -242,7 +242,7 @@ bool KickReadyProcessor::exportWav (const juce::File& file)
 
 juce::AudioProcessorEditor* KickReadyProcessor::createEditor()
 {
-    return new KickReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<KickReadyEditor> (*this);
 }
 
 void KickReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

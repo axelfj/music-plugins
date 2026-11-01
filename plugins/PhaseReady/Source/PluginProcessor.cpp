@@ -171,7 +171,7 @@ void PhaseReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 
 juce::AudioProcessorEditor* PhaseReadyProcessor::createEditor()
 {
-    return new PhaseReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<PhaseReadyEditor> (*this);
 }
 
 void PhaseReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

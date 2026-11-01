@@ -154,7 +154,7 @@ void WideReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* WideReadyProcessor::createEditor()
 {
-    return new WideReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<WideReadyEditor> (*this);
 }
 
 void WideReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

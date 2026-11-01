@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -19,7 +20,7 @@ private:
     float delayMs = 0.0f, duckGain = 1.0f, wetPeak = 0.0f;
 };
 
-class EchoReadyEditor : public juce::AudioProcessorEditor, private juce::Timer
+class EchoReadyEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit EchoReadyEditor (EchoReadyProcessor&);

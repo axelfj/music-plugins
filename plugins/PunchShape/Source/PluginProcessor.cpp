@@ -134,7 +134,7 @@ void PunchShapeProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 
 juce::AudioProcessorEditor* PunchShapeProcessor::createEditor()
 {
-    return new PunchShapeEditor (*this);
+    return rommuser::ui::createScalableEditor<PunchShapeEditor> (*this);
 }
 
 void PunchShapeProcessor::getStateInformation (juce::MemoryBlock& destData)

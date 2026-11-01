@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
@@ -40,7 +41,7 @@ private:
     rommuser::bandpush::PushParams params;
 };
 
-class BandPushEditor : public juce::AudioProcessorEditor, private juce::Timer
+class BandPushEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit BandPushEditor (BandPushProcessor&);

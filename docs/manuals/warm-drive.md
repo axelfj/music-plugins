@@ -32,6 +32,7 @@ Saturator-R **calienta y ensucia** el sonido agregando armónicos, como una cint
 | **SALIDA** | -24 a +24 dB (0 dB) | Ganancia final. |
 | **MIX** | 0 a 100 % (100 %) | Mezcla con la señal limpia (saturación paralela). |
 | **CALIDAD** | 1x, 2x, 4x (2x) | Sobremuestreo. Más = menos brillo digital falso (aliasing) pero más CPU. 2x va bien casi siempre. |
+| **HQ** | encendido / apagado (apagado) | Antialiasing extra (ADAA): mucho menos aliasing con drive alto, a cambio de un poco más de CPU. Con HQ, 2x suena tan limpio como 4x sin HQ. |
 
 **Por banda:**
 
@@ -86,6 +87,7 @@ Saturator-R **warms up and dirties** the sound by adding harmonics, like tape, a
 | **OUTPUT** | -24 to +24 dB (0 dB) | Final gain. |
 | **MIX** | 0 to 100 % (100 %) | Blend with the clean signal (parallel saturation). |
 | **QUALITY** | 1x, 2x, 4x (2x) | Oversampling. More = less fake digital brightness (aliasing) but more CPU. 2x is fine almost always. |
+| **HQ** | on / off (off) | Extra antialiasing (ADAA): much less aliasing at high drive, for a bit more CPU. With HQ, 2x is as clean as 4x without it. |
 
 **Per band:**
 

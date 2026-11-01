@@ -459,7 +459,7 @@ void WaveReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::M
 
 juce::AudioProcessorEditor* WaveReadyProcessor::createEditor()
 {
-    return new WaveReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<WaveReadyEditor> (*this);
 }
 
 void WaveReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

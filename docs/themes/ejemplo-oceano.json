@@ -1,0 +1,11 @@
+{
+  "name": "Océano",
+  "background": "#0B1A1E",
+  "panel": "#12262B",
+  "outline": "#1F3B42",
+  "text": "#E3F4F4",
+  "textDim": "#7FA3A6",
+  "accent": "#2EC4B6",
+  "good": "#8BE38B",
+  "warn": "#FF6B6B"
+}

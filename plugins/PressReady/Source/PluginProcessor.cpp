@@ -178,7 +178,7 @@ void PressReadyProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 
 juce::AudioProcessorEditor* PressReadyProcessor::createEditor()
 {
-    return new PressReadyEditor (*this);
+    return rommuser::ui::createScalableEditor<PressReadyEditor> (*this);
 }
 
 void PressReadyProcessor::getStateInformation (juce::MemoryBlock& destData)

@@ -18,6 +18,7 @@ namespace ParamIDs
     inline constexpr auto output = "output";
     inline constexpr auto mix = "mix";
     inline constexpr auto oversampling = "oversampling";
+    inline constexpr auto hq = "hq";
 
     // "b1type", "b2drive", "b3tone", "b4mix"
     inline juce::String band (int index, const char* suffix) { return "b" + juce::String (index + 1) + suffix; }
@@ -103,6 +104,7 @@ private:
     std::atomic<float>* pBands = nullptr;
     std::atomic<float>* pXover[3] = {};
     std::atomic<float>* pAutoGain = nullptr;
+    std::atomic<float>* pHq = nullptr;
     std::atomic<float>* pInput = nullptr;
     std::atomic<float>* pOutput = nullptr;
     std::atomic<float>* pMix = nullptr;

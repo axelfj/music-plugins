@@ -279,6 +279,61 @@ TEST_CASE ("Tune Ready: a fixed +7 st shift keeps the formant where it was", "[t
     REQUIRE (std::fabs (cOut / cIn - 1.0) < 0.2);      // a plain resample would move it by 50 %
 }
 
+TEST_CASE ("Tune Ready: a shift of a pitch with a fractional period stays on the target harmonics", "[tuneready]")
+{
+    // 220 Hz is 218.18 samples per period: grains placed on whole samples, or read with the
+    // fractional offset the wrong way round, jitter the output pitch (sidebands -20 dB around each
+    // harmonic, about -8 dB of noise in total before the fix).
+    TuneEngine e;
+    e.prepare (sr, 256, 1);
+    auto p = base();
+    p.mode = Mode::fixed;
+    p.fixedSemis = 7.0f;
+    e.setParams (p);
+    std::vector<float> x (96000);
+    for (size_t i = 0; i < x.size(); ++i)
+    {
+        double v = 0.0;
+        for (int h = 1; h <= 20; ++h) v += std::sin (2.0 * pi * h * 220.0 * (double) i / sr) / h;
+        x[i] = (float) (0.3 * v);
+    }
+    run (e, x);
+    // Least-squares fit of the target's harmonics over a Hann-weighted segment; what is left is noise.
+    const double f1 = 220.0 * std::pow (2.0, 7.0 / 12.0);
+    const int from = 48000, n = 32768;
+    std::vector<double> w ((size_t) n), resid ((size_t) n);
+    double total = 0.0;
+    for (int i = 0; i < n; ++i)
+    {
+        w[(size_t) i] = 0.5 - 0.5 * std::cos (2.0 * pi * i / n);
+        resid[(size_t) i] = x[(size_t) (from + i)];
+        total += w[(size_t) i] * resid[(size_t) i] * resid[(size_t) i];
+    }
+    for (int h = 1; h * f1 < 20000.0; ++h)
+    {
+        double sc = 0.0, ss = 0.0, cc = 0.0, sn = 0.0;
+        for (int i = 0; i < n; ++i)
+        {
+            const double ph = 2.0 * pi * h * f1 * (from + i) / sr;
+            sc += w[(size_t) i] * resid[(size_t) i] * std::cos (ph);
+            sn += w[(size_t) i] * resid[(size_t) i] * std::sin (ph);
+            cc += w[(size_t) i] * std::cos (ph) * std::cos (ph);
+            ss += w[(size_t) i] * std::sin (ph) * std::sin (ph);
+        }
+        const double a = sc / cc, b = sn / ss;
+        for (int i = 0; i < n; ++i)
+        {
+            const double ph = 2.0 * pi * h * f1 * (from + i) / sr;
+            resid[(size_t) i] -= a * std::cos (ph) + b * std::sin (ph);
+        }
+    }
+    double left = 0.0;
+    for (int i = 0; i < n; ++i) left += w[(size_t) i] * resid[(size_t) i] * resid[(size_t) i];
+    const double noiseDb = 10.0 * std::log10 (left / total);
+    INFO ("noise " << noiseDb << " dB");
+    REQUIRE (noiseDb < -30.0);
+}
+
 TEST_CASE ("Tune Ready: a +12 st formant shift doubles the formant and leaves the pitch alone", "[tuneready]")
 {
     TuneEngine e;

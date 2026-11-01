@@ -7,8 +7,8 @@
 //   tp = true peak of x (4x oversampled, max over channels) or the sample peak when True Peak is off
 //   gReq = min (1, ceiling / tp)
 //   m    = sliding minimum of gReq over lookahead + 1 samples
-//   a    = moving average of m over lookahead samples   (a linear ramp that reaches gReq exactly when
-//                                                         the delayed peak arrives)
+//   a    = two cascaded moving averages of m (lengths summing to lookahead + 1): a smooth S-shaped
+//          ramp that reaches gReq exactly when the delayed peak arrives
 //   env  = a if a < env, else env + aRel * (a - env)      (release; never above a, so never above ceiling)
 //   y    = delay (x, latency) * env
 //
@@ -21,6 +21,7 @@
 #include "../../../shared/dsp/FractionalDelay.h"
 #include "../../../shared/dsp/Loudness.h"
 #include "../../../shared/dsp/Oversampler.h"
+#include "../../../shared/dsp/PeakGuard.h"
 #include "../../../shared/dsp/Smoothing.h"
 #include "../../ClipReady/Source/ClipEngine.h"
 
@@ -59,53 +60,7 @@ inline constexpr float maxLookaheadMs = 5.0f;
 
 inline float lookaheadMsFor (Style s) { return s == Style::transparent ? 4.0f : s == Style::punchy ? 1.5f : 0.5f; }
 
-// Sliding minimum over a fixed window using a monotonic queue (O(1) amortised per sample).
-class SlidingMin
-{
-public:
-    void prepare (int windowLength)
-    {
-        window = std::max (1, windowLength);
-        values.assign ((size_t) window + 1, 1.0f);
-        indices.assign ((size_t) window + 1, 0);
-        reset();
-    }
-
-    void reset()
-    {
-        front = back = 0;
-        count = 0;
-        n = 0;
-    }
-
-    inline float push (float v)
-    {
-        // Drop larger values from the back: they can never be the minimum while v is in the window.
-        while (count > 0 && values[(size_t) ((back + (int) values.size() - 1) % (int) values.size())] >= v)
-        {
-            back = (back + (int) values.size() - 1) % (int) values.size();
-            --count;
-        }
-        values[(size_t) back] = v;
-        indices[(size_t) back] = n;
-        back = (back + 1) % (int) values.size();
-        ++count;
-        // Drop the front once it leaves the window.
-        if (indices[(size_t) front] <= n - window)
-        {
-            front = (front + 1) % (int) values.size();
-            --count;
-        }
-        ++n;
-        return values[(size_t) front];
-    }
-
-private:
-    std::vector<float> values;
-    std::vector<long long> indices;
-    int window = 1, front = 0, back = 0, count = 0;
-    long long n = 0;
-};
+using dsp::SlidingMin; // shared/dsp/PeakGuard.h
 
 class PeakEngine
 {
@@ -143,9 +98,14 @@ public:
         for (auto& r : hiRing) std::fill (r.begin(), r.end(), 0.0f);
         ringPos = 0;
         slidingMin.reset();
-        avgSum = 0.0;
-        avgBuf.assign ((size_t) std::max (1, lookahead), 1.0f);
+        avgBuf.assign ((size_t) std::max (1, avgLen1), 1.0f);
+        avgSum = (double) avgBuf.size();
         avgPos = 0;
+        avg2Buf.assign ((size_t) std::max (1, avgLen2), 1.0f);
+        avg2Sum = (double) avg2Buf.size();
+        avg2Pos = 0;
+        std::fill (gReqHist.begin(), gReqHist.end(), 1.0f);
+        histPos = 0;
         env = 1.0f;
         grAvgDb = 0.0f;
         loudness.reset();
@@ -161,9 +121,21 @@ public:
         {
             lookahead = newLookahead;
             slidingMin.prepare (lookahead + 1);
-            avgBuf.assign ((size_t) lookahead, 1.0f);
-            avgSum = (double) lookahead;
+            // Two moving averages whose lengths add up to lookahead + 1 turn the attack into a
+            // smooth S-shaped (trapezoid-window) ramp that still reaches the required gain exactly
+            // when the delayed peak arrives: the second average only sees minima of windows that
+            // contain the peak. A single average gives a linear ramp with a corner at its start,
+            // and that corner is heard as a click / intermodulation on dense material.
+            avgLen1 = (lookahead + 2) / 2;
+            avgLen2 = lookahead + 1 - avgLen1;
+            avgBuf.assign ((size_t) avgLen1, 1.0f);
+            avgSum = (double) avgLen1;
             avgPos = 0;
+            avg2Buf.assign ((size_t) avgLen2, 1.0f);
+            avg2Sum = (double) avgLen2;
+            avg2Pos = 0;
+            gReqHist.assign ((size_t) lookahead + 1, 1.0f);
+            histPos = 0;
             latency = lookahead + (p.truePeak ? detectorDelay : 0);
         }
 
@@ -256,8 +228,18 @@ public:
             const float mn = slidingMin.push (gReq);
             avgSum += (double) mn - (double) avgBuf[(size_t) avgPos];
             avgBuf[(size_t) avgPos] = mn;
-            avgPos = (avgPos + 1) % lookahead;
-            const float a = std::min (mn, (float) (avgSum / (double) lookahead));   // min guards rounding
+            if (++avgPos == avgLen1) avgPos = 0;
+            const float a1 = (float) (avgSum / (double) avgLen1);
+            avg2Sum += (double) a1 - (double) avg2Buf[(size_t) avg2Pos];
+            avg2Buf[(size_t) avg2Pos] = a1;
+            if (++avg2Pos == avgLen2) avg2Pos = 0;
+            // Rounding guard: never above the gain the sample leaving now needs. (This used to be the
+            // sliding minimum itself, which already contains the newest peak, so the gain stepped
+            // down to the full reduction `lookahead` samples early instead of ramping.)
+            gReqHist[(size_t) histPos] = gReq;
+            if (++histPos == lookahead + 1) histPos = 0;
+            const float due = gReqHist[(size_t) histPos]; // gReq of lookahead samples ago
+            const float a = std::min (due, (float) (avg2Sum / (double) avgLen2));
 
             if ((i & 15) == 0)
             {
@@ -332,9 +314,11 @@ private:
     int ringPos = 0;
     std::vector<float> gReqBuf;
     SlidingMin slidingMin;
-    std::vector<float> avgBuf;
-    double avgSum = 0.0;
-    int avgPos = 0;
+    std::vector<float> avgBuf, avg2Buf;
+    double avgSum = 0.0, avg2Sum = 0.0;
+    int avgPos = 0, avg2Pos = 0, avgLen1 = 1, avgLen2 = 1;
+    std::vector<float> gReqHist { 1.0f };
+    int histPos = 0;
     dsp::LinearSmoother inGain;
     dsp::LoudnessMeter loudness;
 };

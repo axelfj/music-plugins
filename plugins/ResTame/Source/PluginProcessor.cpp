@@ -180,7 +180,7 @@ void ResTameProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
 
 juce::AudioProcessorEditor* ResTameProcessor::createEditor()
 {
-    return new ResTameEditor (*this);
+    return rommuser::ui::createScalableEditor<ResTameEditor> (*this);
 }
 
 void ResTameProcessor::getStateInformation (juce::MemoryBlock& destData)

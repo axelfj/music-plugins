@@ -30,6 +30,7 @@ Clipper-R **corta los picos** del sonido para que no pasen de un nivel máximo (
 | **SALIDA** | -24 a +12 dB (0 dB) | Volumen final después del clipper. |
 | **MIX** | 0 a 100 % (100 %) | Mezcla entre el original y el recortado (clipping en paralelo). |
 | **CALIDAD** | 1x, 2x, 4x, 8x (4x) | Sobremuestreo. Evita que los agudos se ensucien. 4x es buen balance, 8x para el master, 1x gasta menos CPU. |
+| **HQ** | encendido / apagado (apagado) | Antialiasing extra (ADAA): mucho menos aliasing con mucho drive, a cambio de un poco más de CPU. Con HQ, 2x suena tan limpio como 4x sin HQ. |
 | **LINK** | encendido / apagado (apagado) | Baja la salida lo mismo que subes la entrada, para comparar a igual volumen. |
 | **DELTA** | encendido / apagado (apagado) | Escuchas solo lo que el clipper quita. Es para revisar, no para dejarlo encendido. |
 | **TECHO ESTRICTO** | encendido / apagado (encendido) | Encendido: nada sale por encima del techo, aunque subas Salida o uses Mix. Apagado: un poco más limpio, pero se puede pasar. DELTA nunca se limita. |
@@ -75,6 +76,7 @@ Clipper-R **cuts off the peaks** of a sound so they never go above a maximum lev
 | **OUTPUT** | -24 to +12 dB (0 dB) | Final volume after the clipper. |
 | **MIX** | 0 to 100 % (100 %) | Blend between the original and the clipped sound (parallel clipping). |
 | **QUALITY** | 1x, 2x, 4x, 8x (4x) | Oversampling. Keeps the highs clean. 4x is a good balance, 8x for the master, 1x uses the least CPU. |
+| **HQ** | on / off (off) | Extra antialiasing (ADAA): much less aliasing at high drive, for a bit more CPU. With HQ, 2x is as clean as 4x without it. |
 | **LINK** | on / off (off) | Lowers the output as much as you raise the input, so you compare at equal loudness. |
 | **DELTA** | on / off (off) | Hear only what the clipper removes. It's for checking, not for leaving on. |
 | **STRICT CEILING** | on / off (on) | On: nothing leaves above the ceiling, even with Output or Mix. Off: slightly cleaner, but it can go over. DELTA is never limited. |

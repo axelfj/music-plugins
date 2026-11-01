@@ -4,6 +4,7 @@
 #include "PluginProcessor.h"
 
 #include "ui/RommuserLookAndFeel.h"
+#include "ui/ScalableEditor.h"
 
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_audio_utils/juce_audio_utils.h>
@@ -24,7 +25,7 @@ private:
     bool running = false;
 };
 
-class ArpReadyEditor : public juce::AudioProcessorEditor, private juce::Timer
+class ArpReadyEditor : public juce::Component, private juce::Timer
 {
 public:
     explicit ArpReadyEditor (ArpReadyProcessor&);

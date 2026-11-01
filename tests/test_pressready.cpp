@@ -134,6 +134,28 @@ TEST_CASE ("Attack and release times match the knobs within 10 %", "[pressready]
     REQUIRE (std::fabs (measuredRelease - releaseMs) <= releaseMs * 0.1 + 1.0);
 }
 
+TEST_CASE ("A fast release does not distort a bass note", "[pressready]")
+{
+    // With a 30 ms release the gain could follow each half cycle of 50 Hz; the peak hold bridges
+    // the dips (a 2 ms hold measured -34 dB THD here).
+    CompEngine e;
+    e.prepare (fs, 256, 1);
+    CompParams p;
+    p.thresholdDb = -24.0f;
+    p.ratio = 4.0f;
+    p.attackMs = 1.0f;
+    p.releaseMs = 30.0f;
+    e.setParams (p, true);
+    const auto out = run (e, sine (50.0, fs, 48000 + 65536, 0.5));
+    const auto spec = powerSpectrum (out.data() + 48000, 65536);
+    const double fund = toneLevelDb (spec, fs, 65536, 50.0);
+    double harm = 0.0;
+    for (int h = 2; h <= 10; ++h) harm += std::pow (10.0, toneLevelDb (spec, fs, 65536, 50.0 * h) / 10.0);
+    const double thd = 10.0 * std::log10 (harm) - fund;
+    INFO ("THD " << thd << " dB");
+    REQUIRE (thd < -60.0);
+}
+
 TEST_CASE ("Switching character mid-stream does not click", "[pressready]")
 {
     CompEngine e;

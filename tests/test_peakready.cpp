@@ -229,3 +229,41 @@ TEST_CASE ("Peak Ready: both channels get the same gain from one shared detector
     REQUIRE (gl == Catch::Approx (-0.087).margin (0.05));   // 0.9 -> 0.891 (the ceiling): -0.087 dB net
     REQUIRE (gl == Catch::Approx (gr).margin (0.02));
 }
+
+TEST_CASE ("Peak Ready: the attack ramp starts and ends smoothly (no corner) and still lands on time")
+{
+    PeakEngine e;
+    e.prepare (fs, block, 1);
+    PeakParams p;
+    p.truePeak = false;
+    p.ceilingDb = -6.0f;
+    p.autoRelease = false;
+    p.releaseMs = 1000.0f;
+    e.setParams (p, true);
+
+    // DC at -12 dBFS (below the ceiling) with one sample at 0 dBFS: the gain must dip to exactly
+    // -6 dB on that sample. Dividing the output by the delayed input gives the gain curve.
+    const int n = 4000, spikeAt = 2000;
+    std::vector<float> x ((size_t) n, 0.25f);
+    x[(size_t) spikeAt] = 1.0f;
+    const auto y = run (e, x);
+    const int lat = e.getLatencySamples();
+    std::vector<double> g ((size_t) n, 1.0);
+    for (int i = lat; i < n; ++i) g[(size_t) i] = y[(size_t) i] / x[(size_t) (i - lat)];
+
+    const int peakOut = spikeAt + lat;
+    REQUIRE (g[(size_t) peakOut] == Catch::Approx (std::pow (10.0, -6.0 / 20.0)).margin (1e-5));
+
+    // Steps of the attack ramp: small at the start, largest in the middle (S-curve).
+    double maxStep = 0.0, firstStep = 0.0;
+    int start = -1;
+    for (int i = peakOut - 400; i < peakOut; ++i)
+    {
+        const double step = g[(size_t) i] - g[(size_t) i + 1];
+        if (start < 0 && step > 1e-9) { start = i; firstStep = step; }
+        maxStep = std::max (maxStep, step);
+    }
+    REQUIRE (start > 0);
+    INFO ("first step " << firstStep << " max step " << maxStep);
+    REQUIRE (firstStep < 0.1 * maxStep);
+}

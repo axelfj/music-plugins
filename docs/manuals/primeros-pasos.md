@@ -62,7 +62,8 @@ El sidechain es cuando un sonido **controla** a otro. Ejemplo típico: el bombo 
 ### 6. Cosas que funcionan igual en todos
 
 - **Idioma:** la interfaz sale en español si tu computadora está en español, si no en inglés.
-- **Tamaño:** arrastra la esquina de abajo a la derecha para hacer la ventana más grande.
+- **Tamaño:** arrastra la esquina de abajo a la derecha, o usa el botón de los tres puntos de colores (arriba a la derecha), para ir de 75 % a 250 %. Se ve nítido a cualquier tamaño.
+- **Temas:** en ese mismo botón eliges un tema de colores (ROMMUSER, Medianoche, Neón, Bosque, Atardecer, Claro, Alto contraste) o creas el tuyo. Cada plugin recuerda su tamaño y su tema. Más detalles en [THEMES.md](../THEMES.md).
 - **Ayuda:** deja el mouse quieto sobre cualquier perilla o botón y sale una explicación.
 - **Valor por defecto:** doble clic en una perilla la regresa a su valor inicial.
 - **Compara a igual volumen:** lo que suena más fuerte siempre parece "mejor". Muchos plugins traen **Auto Gain** o **Link** para que no te engañes.
@@ -143,7 +144,8 @@ Sidechain means one sound **controls** another. Classic example: the kick makes 
 ### 6. Things that work the same everywhere
 
 - **Language:** the UI is in Spanish if your computer is in Spanish, otherwise English.
-- **Size:** drag the bottom-right corner to make the window bigger.
+- **Size:** drag the bottom-right corner, or use the three coloured dots button (top right), to go from 75 % to 250 %. It stays sharp at any size.
+- **Themes:** in that same button you pick a colour theme (ROMMUSER, Midnight, Neon, Forest, Sunset, Light, High contrast) or make your own. Each plugin remembers its size and theme. More in [THEMES.md](../THEMES.md).
 - **Help:** hover the mouse over any knob or button to get an explanation.
 - **Default value:** double-click a knob to send it back to its starting value.
 - **Compare at equal loudness:** louder always sounds "better". Many plugins have **Auto Gain** or **Link** so you don't fool yourself.

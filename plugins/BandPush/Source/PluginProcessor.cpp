@@ -150,7 +150,7 @@ void BandPushProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mi
 
 juce::AudioProcessorEditor* BandPushProcessor::createEditor()
 {
-    return new BandPushEditor (*this);
+    return rommuser::ui::createScalableEditor<BandPushEditor> (*this);
 }
 
 void BandPushProcessor::getStateInformation (juce::MemoryBlock& destData)

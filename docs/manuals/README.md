@@ -27,6 +27,7 @@ Un manual por plugin, en español y en inglés: qué hace, cómo empezar en un m
 | [Sidechain-R](duck-ready.md) | Bombeo al ritmo | Tempo-synced pumping |
 | [Delay-R](echo-ready.md) | Ecos | Echoes |
 | [Reverb-R](space-ready.md) | Espacio y profundidad | Space and depth |
+| [Pitch-R](pitch-r.md) | Subir o bajar el tono de lo que sea | Shift the pitch of anything |
 | [Pitch Delay-R](shimmer-ready.md) | Ecos que cambian de tono, shimmer | Pitch-shifting echoes, shimmer |
 | [Chorus-R](wide-ready.md) | Chorus, flanger, ancho | Chorus, flanger, width |
 | [Phaser-R](phase-ready.md) | Movimiento que gira | Swirling movement |
