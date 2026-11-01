@@ -243,7 +243,11 @@ jobs:
           done
           # Every single-plugin installer too, for anyone who wants just a few.
           find artifacts/Windows artifacts/macOS artifacts/Linux -type f ! -name 'ROMMUSER-Plugins-*' -exec cp {} installers/ \;
-          (cd installers && zip -q -9 ../release/ROMMUSER-Plugins-todos-los-instaladores.zip *)
+          # The manuals ride along, with the screenshots their relative image paths point to.
+          mkdir -p installers/manuales
+          cp -R docs/manuals installers/manuales/manuals
+          cp -R docs/screenshots installers/manuales/screenshots
+          (cd installers && zip -q -9 -r ../release/ROMMUSER-Plugins-todos-los-instaladores.zip .)
           (cd release && sha256sum * > SHA256SUMS)
           ls -l release
           {
@@ -254,7 +258,7 @@ jobs:
             echo "- Windows: \`ROMMUSER-Plugins-Windows-Setup.exe\` (VST3 + CLAP)"
             echo "- macOS: \`ROMMUSER-Plugins-macOS.pkg\` (VST3 + AU + CLAP, Intel y Apple silicon)"
             echo "- Linux: \`ROMMUSER-Plugins-Linux.tar.gz\` (descomprime en / extract into \`~/.vst3\` y/and \`~/.clap\`)"
-            echo "- \`ROMMUSER-Plugins-todos-los-instaladores.zip\`: el instalador de cada plugin por separado / each plugin's own installer"
+            echo "- \`ROMMUSER-Plugins-todos-los-instaladores.zip\`: el instalador de cada plugin por separado y los manuales / each plugin's own installer and the manuals"
             echo
             echo "### Incluye / Includes"
             echo

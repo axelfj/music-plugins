@@ -123,7 +123,7 @@ En ese mismo botón eliges el tema (ROMMUSER, Medianoche, Neón, Bosque, Atardec
 
 ## Instalar
 
-**Todos los plugins de una vez** (recomendado): descarga el instalador de tu sistema desde [studio.rommuser.com/plugins](https://studio.rommuser.com/plugins/) o desde el [último release](https://github.com/axelfj/music-plugins/releases/latest): `ROMMUSER-Plugins-Windows-Setup.exe`, `ROMMUSER-Plugins-macOS.pkg` o `ROMMUSER-Plugins-Linux.tar.gz`. En Windows y macOS puedes desmarcar los plugins que no quieras (en macOS, en *Personalizar*). El mismo release trae `ROMMUSER-Plugins-todos-los-instaladores.zip` con el instalador de cada plugin por separado.
+**Todos los plugins de una vez** (recomendado): descarga el instalador de tu sistema desde [studio.rommuser.com/plugins](https://studio.rommuser.com/plugins/) o desde el [último release](https://github.com/axelfj/music-plugins/releases/latest): `ROMMUSER-Plugins-Windows-Setup.exe`, `ROMMUSER-Plugins-macOS.pkg` o `ROMMUSER-Plugins-Linux.tar.gz`. En Windows y macOS puedes desmarcar los plugins que no quieras (en macOS, en *Personalizar*). El mismo release trae `ROMMUSER-Plugins-todos-los-instaladores.zip` con el instalador de cada plugin por separado y los [manuales](docs/manuals/README.md).
 
 **Un solo plugin:** búscalo en [Releases](https://github.com/axelfj/music-plugins/releases). Cada archivo lleva el nombre del plugin, por ejemplo `EQ-R-Setup-1.0.0-alpha.2.exe`.
 
