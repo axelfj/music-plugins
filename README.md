@@ -123,7 +123,9 @@ En ese mismo botón eliges el tema (ROMMUSER, Medianoche, Neón, Bosque, Atardec
 
 ## Instalar
 
-Descarga la última versión desde [Releases](https://github.com/axelfj/music-plugins/releases). Cada archivo lleva el nombre del plugin, por ejemplo `EQ-R-Setup-1.0.0-alpha.2.exe`.
+**Todos los plugins de una vez** (recomendado): descarga el instalador de tu sistema desde [studio.rommuser.com/plugins](https://studio.rommuser.com/plugins/) o desde el [último release](https://github.com/axelfj/music-plugins/releases/latest): `ROMMUSER-Plugins-Windows-Setup.exe`, `ROMMUSER-Plugins-macOS.pkg` o `ROMMUSER-Plugins-Linux.tar.gz`. En Windows y macOS puedes desmarcar los plugins que no quieras (en macOS, en *Personalizar*). El mismo release trae `ROMMUSER-Plugins-todos-los-instaladores.zip` con el instalador de cada plugin por separado y los [manuales](docs/manuals/README.md).
+
+**Un solo plugin:** búscalo en [Releases](https://github.com/axelfj/music-plugins/releases). Cada archivo lleva el nombre del plugin, por ejemplo `EQ-R-Setup-1.0.0-alpha.2.exe`.
 
 **Windows:** abre `<Plugin>-Setup-<versión>.exe`. Instala el VST3 (y CLAP) en las carpetas estándar. Si Windows muestra "Windows protegió tu PC", haz clic en *Más información* y luego *Ejecutar de todas formas*: el instalador no está firmado todavía, pero el código es público en este repo.
 
@@ -167,6 +169,8 @@ Cada plugin lleva pruebas automáticas de DSP que corren en CI en Windows, macOS
 ## Publicar una versión
 
 Cada plugin se versiona por separado: `plugins/<Name>/VERSION` guarda la versión completa (por ejemplo `1.0.0-alpha.2`; la parte numérica es la que ven el DAW y los instaladores) y `CHANGELOG.md` tiene una sección por versión. Para publicar, sube `VERSION` y el changelog, mergea, y corre el workflow **Build** manualmente (*Run workflow*) con la carpeta del plugin y exactamente esa versión, por ejemplo `ClipReady` (Clipper-R) y `1.0.0-alpha.3`. CI compila en los tres sistemas, valida, crea el tag `clip-ready-v1.0.0-alpha.3` y sube los instaladores al release.
+
+Para publicar el paquete con **todos** los plugins, corre el mismo workflow con plugin `All` y una versión libre (por ejemplo `1.0.0-beta.1`). Crea el tag `all-plugins-v1.0.0-beta.1` con los tres instaladores combinados y el zip de instaladores sueltos, y lo marca como *latest*: la página de descargas enlaza a `releases/latest/download/<archivo>`, así que siempre sirve el paquete más nuevo. Los releases de un solo plugin nunca se marcan como *latest*.
 
 ## Contribuir
 

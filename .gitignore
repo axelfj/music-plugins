@@ -12,3 +12,4 @@ _deps/
 
 __pycache__/
 *.pyc
+installer/windows/all-plugins-files.iss
