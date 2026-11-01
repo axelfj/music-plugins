@@ -7,11 +7,11 @@ on:
   workflow_dispatch:
     inputs:
       plugin:
-        description: "Plugin to release (folder name under plugins/)"
+        description: "Plugin to release (folder name under plugins/), or All for the bundle with every plugin"
         required: true
         default: ClipReady
       version:
-        description: "Release version, e.g. 1.0.0-alpha.1 (must equal the plugin's VERSION file)"
+        description: "Release version, e.g. 1.0.0-alpha.1 (must equal the plugin's VERSION file; free for All)"
         required: true
 
 permissions:
@@ -26,6 +26,8 @@ concurrency:
 
 env:
   BUILD_TYPE: Release
+  # Version stamped into the all-plugins installers; only meaningful on an "All" release.
+  BUNDLE_VERSION: ${{ inputs.plugin == 'All' && inputs.version || '0.0.0' }}
 
 jobs:
   tests:
@@ -160,11 +162,33 @@ jobs:
             & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" @iscc installer\windows\plugin.iss
             if ($LASTEXITCODE -ne 0) { exit 1 }
           }
+          # One installer with every plugin: a component per plugin, all ticked by default.
+          $components = @("[Components]"); $files = @("[Files]"); $cleanup = @("[InstallDelete]")
+          foreach ($dir in Get-ChildItem plugins -Directory) {
+            $name = $dir.Name
+            $art = (Get-ChildItem "build/plugins/$name" -Directory -Filter "*_artefacts" | Select-Object -First 1).FullName + "\${{ env.BUILD_TYPE }}"
+            $product = (Get-ChildItem "$art/VST3" -Filter "*.vst3" | Select-Object -First 1).Name -replace '\.vst3$', ''
+            $components += "Name: ""$name""; Description: ""$product""; Types: full compact custom"
+            $files += "Source: ""$art\VST3\$product.vst3\*""; DestDir: ""{commoncf64}\VST3\$product.vst3""; Components: $name; Flags: ignoreversion recursesubdirs createallsubdirs"
+            $files += "Source: ""$art\CLAP\$product.clap""; DestDir: ""{commoncf64}\CLAP""; Components: $name; Flags: ignoreversion"
+            if (Test-Path "plugins/$name/FORMER_NAMES") {
+              $former = (Get-Content "plugins/$name/FORMER_NAMES" -First 1).Trim()
+              if ($former) {
+                $cleanup += "Type: filesandordirs; Name: ""{commoncf64}\VST3\$former.vst3""; Components: $name"
+                $cleanup += "Type: files; Name: ""{commoncf64}\CLAP\$former.clap""; Components: $name"
+              }
+            }
+          }
+          ($components + "" + $files + "" + $cleanup) | Set-Content -Encoding UTF8 installer\windows\all-plugins-files.iss
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DBundleVersion=${{ env.BUNDLE_VERSION }}" installer\windows\all-plugins.iss
+          if ($LASTEXITCODE -ne 0) { exit 1 }
           Get-ChildItem dist
 
       - name: Package (macOS pkg)
         if: runner.os == 'macOS'
-        run: installer/macos/build-pkg.sh build ${{ env.BUILD_TYPE }} dist
+        run: |
+          installer/macos/build-pkg.sh build ${{ env.BUILD_TYPE }} dist
+          installer/macos/build-bundle.sh dist dist/ROMMUSER-Plugins-macOS.pkg "${{ env.BUNDLE_VERSION }}"
 
       - name: Package (Linux tarball)
         if: runner.os == 'Linux'
@@ -176,6 +200,12 @@ jobs:
             product=$(basename "$art"/VST3/*.vst3 .vst3)
             tar -C "$art" -czf "dist/${product// /}-$version-linux-x86_64.tar.gz" VST3 CLAP
           done
+          # Every plugin in one archive, laid out like ~/.vst3 and ~/.clap.
+          all=$(mktemp -d); mkdir -p "$all/VST3" "$all/CLAP"
+          for art in build/plugins/*/*_artefacts/${{ env.BUILD_TYPE }}; do
+            cp -R "$art"/VST3/*.vst3 "$all/VST3/"; cp "$art"/CLAP/*.clap "$all/CLAP/"
+          done
+          tar -C "$all" -czf dist/ROMMUSER-Plugins-Linux.tar.gz VST3 CLAP
           ls -l dist
 
       - uses: actions/upload-artifact@v4
@@ -194,8 +224,63 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+      - name: Collect the all-plugins bundle
+        id: bundle
+        if: inputs.plugin == 'All'
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          version="$RELEASE_VERSION"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$ ]] || { echo "::error::Invalid version"; exit 1; }
+          echo "tag=all-plugins-v$version" >> "$GITHUB_OUTPUT"
+          echo "title=ROMMUSER Plugins $version (todos / all)" >> "$GITHUB_OUTPUT"
+          mkdir -p release installers
+          bundle=(ROMMUSER-Plugins-Windows-Setup.exe ROMMUSER-Plugins-macOS.pkg ROMMUSER-Plugins-Linux.tar.gz)
+          for f in "${bundle[@]}"; do
+            src=$(find artifacts -type f -name "$f" | head -n1)
+            [ -n "$src" ] || { echo "::error::missing asset $f"; exit 1; }
+            cp "$src" release/
+          done
+          # Every single-plugin installer too, for anyone who wants just a few.
+          find artifacts/Windows artifacts/macOS artifacts/Linux -type f ! -name 'ROMMUSER-Plugins-*' -exec cp {} installers/ \;
+          (cd installers && zip -q -9 ../release/ROMMUSER-Plugins-todos-los-instaladores.zip *)
+          (cd release && sha256sum * > SHA256SUMS)
+          ls -l release
+          {
+            echo "Todos los plugins de ROMMUSER en un solo instalador. Beta: funcionan, pero todavía los estamos mejorando. / Every ROMMUSER plugin in one installer. Beta: they work, but we are still improving them."
+            echo
+            echo "### Descarga / Download"
+            echo
+            echo "- Windows: \`ROMMUSER-Plugins-Windows-Setup.exe\` (VST3 + CLAP)"
+            echo "- macOS: \`ROMMUSER-Plugins-macOS.pkg\` (VST3 + AU + CLAP, Intel y Apple silicon)"
+            echo "- Linux: \`ROMMUSER-Plugins-Linux.tar.gz\` (descomprime en / extract into \`~/.vst3\` y/and \`~/.clap\`)"
+            echo "- \`ROMMUSER-Plugins-todos-los-instaladores.zip\`: el instalador de cada plugin por separado / each plugin's own installer"
+            echo
+            echo "### Incluye / Includes"
+            echo
+            for dir in plugins/*/; do
+              product=$(sed -nE 's/^ *NAME "([^"]+)".*/\1/p' "$dir/CMakeLists.txt" | head -n1)
+              echo "- $product $(head -n1 "$dir/VERSION")"
+            done
+            echo
+            echo "Los instaladores todavia no estan firmados; el README explica como abrirlos la primera vez. / The installers are not code-signed yet; see the README for the first-launch steps."
+          } > notes.md
+      - uses: softprops/action-gh-release@v2
+        if: inputs.plugin == 'All'
+        with:
+          tag_name: ${{ steps.bundle.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ steps.bundle.outputs.title }}
+          # Not a prerelease and marked latest, so releases/latest/download/<file> always serves
+          # the newest bundle (studio.rommuser.com/plugins/ links there).
+          prerelease: false
+          make_latest: true
+          body_path: notes.md
+          files: release/*
+
       - name: Check version and collect files
         id: prep
+        if: inputs.plugin != 'All'
         env:
           RELEASE_PLUGIN: ${{ inputs.plugin }}
           RELEASE_VERSION: ${{ inputs.version }}
@@ -238,11 +323,14 @@ jobs:
           open("notes.md", "w", encoding="utf-8").write(notes)
           EOF
       - uses: softprops/action-gh-release@v2
+        if: inputs.plugin != 'All'
         with:
           tag_name: ${{ steps.prep.outputs.tag }}
           target_commitish: ${{ github.sha }}
           name: ${{ steps.prep.outputs.title }}
           prerelease: ${{ steps.prep.outputs.prerelease == 'true' }}
+          # Only the all-plugins bundle is "latest"; the site's download links depend on that.
+          make_latest: false
           body_path: notes.md
           files: release/*
 
