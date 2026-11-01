@@ -1,10 +1,12 @@
 // Renders a plugin's editor to a PNG for the README gallery.
 //
-//     <Plugin>_Screenshot <output.png> [scale]
+//     <Plugin>_Screenshot <output.png> [scale] [paramID=value ...]
 //
 // Built once per plugin when MUSIC_PLUGINS_BUILD_SCREENSHOTS is ON (see cmake/MusicPlugin.cmake).
 // It links the plugin's shared code, feeds it a short drum + bass loop (or a held chord for
 // instruments) so meters and analysers show something, then snapshots the editor offscreen.
+// paramID=value pairs (plain units, e.g. semitones=7) set parameters first, for plugins whose
+// defaults would show nothing happening; render.sh reads them from plugins/<Name>/SCREENSHOT_PARAMS.
 // On Linux run it under xvfb-run; tools/screenshot/render.sh does all of this for every plugin.
 //
 // Themes: ROMMUSER_THEME=<name> opens with that theme. ROMMUSER_SWITCH_THEME=<name> switches to
@@ -47,9 +49,14 @@ float testSignal (int64_t n, int channel)
 class Renderer : private juce::Timer
 {
 public:
-    Renderer (juce::File outputFile, float snapshotScale) : output (outputFile), scale (snapshotScale)
+    Renderer (juce::File outputFile, float snapshotScale, const juce::StringArray& params) : output (outputFile), scale (snapshotScale)
     {
         processor.reset (createPluginFilter());
+        for (const auto& pair : params)
+            for (auto* param : processor->getParameters())
+                if (auto* ranged = dynamic_cast<juce::RangedAudioParameter*> (param))
+                    if (ranged->paramID == pair.upToFirstOccurrenceOf ("=", false, false))
+                        ranged->setValueNotifyingHost (ranged->convertTo0to1 (pair.fromFirstOccurrenceOf ("=", false, false).getFloatValue()));
         processor->enableAllBuses();
         processor->setRateAndBufferSizeDetails (sampleRate, blockSize);
         processor->prepareToPlay (sampleRate, blockSize);
@@ -170,15 +177,19 @@ int main (int argc, char* argv[])
 {
     if (argc < 2)
     {
-        std::cerr << "usage: " << argv[0] << " <output.png> [scale]" << std::endl;
+        std::cerr << "usage: " << argv[0] << " <output.png> [scale] [paramID=value ...]" << std::endl;
         return 1;
     }
 
     const auto output = juce::File::getCurrentWorkingDirectory().getChildFile (juce::String (argv[1]));
     const float scale = argc > 2 ? juce::jlimit (0.5f, 4.0f, juce::String (argv[2]).getFloatValue()) : 1.0f;
 
+    juce::StringArray params;
+    for (int i = 3; i < argc; ++i)
+        params.add (juce::String (argv[i]));
+
     juce::ScopedJuceInitialiser_GUI juce;
-    Renderer renderer (output, scale);
+    Renderer renderer (output, scale, params);
     juce::MessageManager::getInstance()->runDispatchLoop();
     return renderer.succeeded() ? 0 : 1;
 }

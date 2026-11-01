@@ -30,5 +30,9 @@ for dir in "$root"/plugins/*/; do
     name="$(basename "$dir")"
     slug="$(echo "$name" | sed -E 's/([a-z0-9])([A-Z])/\1-\2/g' | tr '[:upper:]' '[:lower:]')"
     exe="$(find "$build/plugins/$name" -type f -name "${name}_Screenshot*" \( -perm -u+x -o -name '*.exe' \) | head -n 1)"
-    "${run[@]}" "$exe" "$out/$slug.png" "$scale"
+    params=()
+    if [[ -f "$dir/SCREENSHOT_PARAMS" ]]; then
+        read -r -a params < "$dir/SCREENSHOT_PARAMS"
+    fi
+    "${run[@]}" "$exe" "$out/$slug.png" "$scale" ${params[@]+"${params[@]}"}
 done
